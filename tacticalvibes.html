@@ -3,30 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tactical Vibes — High-Signal Living for the Modern Operator</title>
-  <meta name="description" content="Tactical Vibes is a high-signal lifestyle and strategy app for operators who move with purpose and intention every day. Coming soon to the App Store." />
+  <title>Tactical Vibes — Firearm Compatibility Database for Shooters & Builders</title>
+  <meta name="description" content="Build your perfect setup with confidence. Find compatible optics, ammunition, and firearm accessories using a powerful firearm compatibility database designed for shooters, builders, and gun enthusiasts." />
   <meta property="og:title" content="Tactical Vibes" />
-  <meta property="og:description" content="High-signal living for the modern operator. Coming soon." />
+  <meta property="og:description" content="Build your perfect setup with confidence. Find compatible optics, ammunition, and firearm accessories." />
   <meta property="og:url" content="https://gratus1.io/tacticalvibes" />
   <style>
     :root {
-      --amber: #D4860A;
-      --amber-bright: #EF9F27;
-      --amber-light: rgba(212,134,10,0.12);
-      --amber-glow: rgba(239,159,39,0.08);
-      --amber-border: rgba(212,134,10,0.25);
-      --ink: #080a07;
-      --ink-mid: #111409;
-      --ink-soft: #2a2e1a;
+      --amber: #C17A2A;
+      --amber-bright: #D4921F;
+      --amber-light: rgba(193,122,42,0.12);
+      --amber-border: rgba(193,122,42,0.25);
+      --red: #B03A2E;
+      --red-light: rgba(176,58,46,0.1);
+      --ink: #080908;
+      --ink-mid: #0f1210;
+      --ink-soft: #1e2620;
       --slate: rgba(255,255,255,0.5);
       --slate-dim: rgba(255,255,255,0.25);
       --white: #ffffff;
       --teal: #1D9E75;
       --teal-mid: #5DCAA5;
       --border: 1px solid rgba(255,255,255,0.06);
-      --border-amber: 1px solid rgba(212,134,10,0.2);
+      --border-amber: 1px solid rgba(193,122,42,0.22);
       --radius: 6px;
-      --radius-lg: 14px;
+      --radius-lg: 12px;
       --serif: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Hoefler Text', Garamond, serif;
       --sans: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       --mono: 'Courier New', Courier, monospace;
@@ -46,7 +47,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 1.25rem 3rem;
-      background: rgba(8,10,7,0.93);
+      background: rgba(8,9,8,0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: var(--border);
@@ -70,14 +71,14 @@
       transition: color 0.2s;
     }
     .nav-back:hover { color: var(--amber-bright); }
-    .nav-notify {
-      font-size: 13px; font-weight: 500;
+    .nav-cta {
+      font-size: 13px; font-weight: 600;
       color: var(--ink); background: var(--amber-bright);
       padding: 10px 22px; border-radius: var(--radius);
-      text-decoration: none; letter-spacing: 0.02em;
+      text-decoration: none; letter-spacing: 0.03em;
       transition: background 0.2s, transform 0.15s;
     }
-    .nav-notify:hover { background: var(--amber); transform: translateY(-1px); }
+    .nav-cta:hover { background: var(--amber); transform: translateY(-1px); }
 
     /* HERO */
     .hero {
@@ -86,27 +87,21 @@
       padding: 8rem 2rem 5rem;
       position: relative; overflow: hidden;
     }
-    .hero-bg-texture {
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 35%, rgba(193,122,42,0.1) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 50% at 15% 75%, rgba(176,58,46,0.06) 0%, transparent 65%);
+    }
+    .hero-texture {
       position: absolute; inset: 0;
       background-image: repeating-linear-gradient(
-        45deg,
-        rgba(212,134,10,0.015) 0px,
-        rgba(212,134,10,0.015) 1px,
+        -45deg,
+        rgba(255,255,255,0.012) 0px,
+        rgba(255,255,255,0.012) 1px,
         transparent 1px,
-        transparent 12px
+        transparent 14px
       );
-    }
-    .hero-glow-top {
-      position: absolute; top: -5%; right: 10%;
-      width: 600px; height: 500px;
-      background: radial-gradient(ellipse, rgba(212,134,10,0.1) 0%, transparent 65%);
-      pointer-events: none;
-    }
-    .hero-glow-bottom {
-      position: absolute; bottom: -10%; left: 5%;
-      width: 500px; height: 400px;
-      background: radial-gradient(ellipse, rgba(29,158,117,0.06) 0%, transparent 65%);
-      pointer-events: none;
     }
     .hero-inner {
       position: relative; z-index: 1;
@@ -115,7 +110,7 @@
       max-width: 1100px; margin: 0 auto; width: 100%;
     }
     .hero-badge {
-      display: inline-flex; align-items: center; gap: 10px;
+      display: inline-flex; align-items: center; gap: 8px;
       font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--amber-bright);
       border: var(--border-amber);
@@ -124,43 +119,246 @@
       margin-bottom: 1.75rem;
       opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
     }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--amber-bright); border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
     .hero-title {
       font-family: var(--serif);
-      font-size: clamp(40px, 5.5vw, 74px);
-      font-weight: 400; line-height: 1.04;
+      font-size: clamp(38px, 5vw, 68px);
+      font-weight: 400; line-height: 1.05;
       color: var(--white); margin-bottom: 1.5rem;
       letter-spacing: -0.01em;
       opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
     }
     .hero-title em { font-style: italic; color: var(--amber-bright); }
-    .hero-title strong { font-weight: 600; }
     .hero-sub {
       font-size: 17px; font-weight: 300;
       color: var(--slate); line-height: 1.8;
-      margin-bottom: 2.75rem;
+      margin-bottom: 2.5rem;
       opacity: 0; animation: fadeUp 0.7s ease 0.4s forwards;
     }
     .hero-actions {
-      display: flex; flex-direction: column; gap: 1rem; align-items: flex-start;
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
       opacity: 0; animation: fadeUp 0.7s ease 0.55s forwards;
     }
-    .notify-form {
-      display: flex; gap: 0; width: 100%; max-width: 400px;
+    .btn-launch {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600;
+      color: var(--ink); background: var(--amber-bright);
+      padding: 15px 32px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-launch:hover { background: var(--amber); transform: translateY(-2px); }
+    .btn-ghost {
+      font-size: 14px; font-weight: 400;
+      color: rgba(255,255,255,0.45); text-decoration: none;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--amber-bright); border-color: var(--amber-bright); }
+
+    /* APP PREVIEW */
+    .hero-visual {
+      display: flex; justify-content: center;
+      opacity: 0; animation: fadeUp 0.8s ease 0.45s forwards;
+    }
+    .app-card {
+      width: 320px;
+      background: linear-gradient(160deg, #141a12 0%, #0b0e09 100%);
+      border: var(--border-amber);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(193,122,42,0.06);
+    }
+    .app-card-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-card-title {
+      font-family: var(--serif);
+      font-size: 17px; font-weight: 500;
+      color: var(--white);
+    }
+    .app-card-title span { color: var(--amber-bright); }
+    .app-live-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--ink); background: var(--amber-bright);
+      padding: 3px 9px; border-radius: 10px;
+      text-transform: uppercase;
+    }
+    .app-section { padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .app-section-label {
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--amber-bright); margin-bottom: 0.65rem; opacity: 0.65;
+    }
+    .search-bar {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .search-icon { font-size: 13px; opacity: 0.4; }
+    .search-text { font-size: 12px; color: rgba(255,255,255,0.3); }
+    .result-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-name { color: rgba(255,255,255,0.8); font-weight: 400; }
+    .result-tag {
+      font-size: 10px; padding: 2px 8px; border-radius: 8px;
+      font-weight: 500; letter-spacing: 0.04em;
+    }
+    .tag-compatible { background: rgba(29,158,117,0.15); color: #5DCAA5; }
+    .tag-verify { background: var(--amber-light); color: var(--amber-bright); }
+    .tag-incompatible { background: var(--red-light); color: #e07060; }
+    .compat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .compat-item {
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    .compat-label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+    .compat-val { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 400; }
+    .app-footer {
+      padding: 0.9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-footer-text { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+    /* FEATURES */
+    .features { padding: 6rem 2rem; background: var(--ink-mid); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--amber-bright); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 400; color: var(--white);
+      line-height: 1.1; margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-size: 16px; font-weight: 300;
+      color: var(--slate); line-height: 1.8;
+      max-width: 520px; margin-bottom: 3.5rem;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px; background: rgba(255,255,255,0.04);
+      border: var(--border); border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .feature-card {
+      padding: 2.25rem 2rem;
+      background: var(--ink-mid);
+      transition: background 0.2s;
+    }
+    .feature-card:hover { background: rgba(193,122,42,0.04); }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--amber-light);
+      border: var(--border-amber);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 1.25rem;
+    }
+    .feature-title { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 13px; font-weight: 300; color: var(--slate); line-height: 1.7; }
+
+    /* USE CASES */
+    .use-cases { padding: 6rem 2rem; background: var(--ink); }
+    .use-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .use-card {
+      padding: 2rem 1.75rem;
+      border: var(--border);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.02);
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .use-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--amber-bright), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .use-card:hover { border-color: var(--amber-border); background: rgba(193,122,42,0.03); }
+    .use-card:hover::after { opacity: 1; }
+    .use-num {
+      font-family: var(--mono);
+      font-size: 11px; letter-spacing: 0.1em;
+      color: var(--amber-bright); opacity: 0.45;
+      margin-bottom: 1.1rem;
+    }
+    .use-title {
+      font-family: var(--serif);
+      font-size: 20px; font-weight: 400;
+      color: var(--white); margin-bottom: 0.65rem;
+    }
+    .use-desc {
+      font-size: 13px; font-weight: 300;
+      color: var(--slate); line-height: 1.75;
+    }
+
+    /* STATS */
+    .stats-band {
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, rgba(193,122,42,0.1) 0%, rgba(193,122,42,0.03) 100%);
+      border-top: var(--border-amber);
+      border-bottom: var(--border-amber);
+    }
+    .stats-grid {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 2rem; text-align: center;
+    }
+    .stat-value {
+      font-family: var(--serif);
+      font-size: 48px; font-weight: 400;
+      color: var(--amber-bright); line-height: 1; margin-bottom: 0.5rem;
+    }
+    .stat-label {
+      font-size: 12px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+    }
+
+    /* CTA */
+    .cta { padding: 7rem 2rem; text-align: center; background: var(--ink-mid); }
+    .cta .section-title { max-width: 580px; margin: 0 auto 1rem; }
+    .cta p {
+      font-size: 16px; font-weight: 300;
+      color: var(--slate); margin: 0 auto 2.5rem;
+      max-width: 480px; line-height: 1.8;
+    }
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .notify-row {
+      display: flex; gap: 0; max-width: 400px; margin: 1rem auto 0;
     }
     .notify-input {
-      flex: 1; padding: 14px 18px;
+      flex: 1; padding: 13px 18px;
       background: rgba(255,255,255,0.05);
-      border: var(--border-amber);
-      border-right: none;
+      border: var(--border-amber); border-right: none;
       border-radius: var(--radius) 0 0 var(--radius);
       color: var(--white); font-family: var(--sans); font-size: 14px;
       outline: none;
-      transition: background 0.2s, border-color 0.2s;
     }
-    .notify-input::placeholder { color: var(--slate-dim); }
-    .notify-input:focus { background: rgba(255,255,255,0.08); border-color: var(--amber-bright); }
+    .notify-input::placeholder { color: rgba(255,255,255,0.25); }
+    .notify-input:focus { background: rgba(255,255,255,0.08); }
     .notify-btn {
-      padding: 14px 22px;
+      padding: 13px 22px;
       background: var(--amber-bright); color: var(--ink);
       border: none; cursor: pointer;
       border-radius: 0 var(--radius) var(--radius) 0;
@@ -169,190 +367,7 @@
       transition: background 0.2s;
     }
     .notify-btn:hover { background: var(--amber); }
-    .hero-note {
-      font-size: 12px; color: var(--slate-dim);
-      letter-spacing: 0.04em;
-    }
-
-    /* APP PREVIEW CARD */
-    .hero-visual {
-      display: flex; justify-content: center;
-      opacity: 0; animation: fadeUp 0.8s ease 0.45s forwards;
-    }
-    .app-card {
-      width: 320px;
-      background: linear-gradient(160deg, #161a0e 0%, #0c0e07 100%);
-      border: var(--border-amber);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,134,10,0.08);
-    }
-    .app-card-header {
-      padding: 1.5rem 1.5rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .app-card-title {
-      font-family: var(--serif);
-      font-size: 18px; font-weight: 400;
-      color: var(--white); letter-spacing: 0.01em;
-    }
-    .app-card-title span { color: var(--amber-bright); }
-    .app-version {
-      font-size: 10px; letter-spacing: 0.1em;
-      color: var(--slate-dim); text-transform: uppercase;
-      background: rgba(255,255,255,0.04);
-      padding: 3px 8px; border-radius: 10px;
-    }
-    .app-section { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
-    .app-section-label {
-      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--amber-bright); margin-bottom: 0.75rem; opacity: 0.7;
-    }
-    .daily-brief {
-      font-size: 13px; font-weight: 300;
-      color: rgba(255,255,255,0.7); line-height: 1.6;
-    }
-    .daily-brief strong { color: var(--white); font-weight: 500; }
-    .metrics-row { display: flex; gap: 8px; }
-    .metric {
-      flex: 1; padding: 12px 10px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 8px; text-align: center;
-    }
-    .metric-val {
-      font-family: var(--serif);
-      font-size: 22px; font-weight: 400;
-      color: var(--amber-bright); line-height: 1; margin-bottom: 4px;
-    }
-    .metric-lbl { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate-dim); }
-    .priority-list { display: flex; flex-direction: column; gap: 8px; }
-    .priority-item {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 12px; color: rgba(255,255,255,0.6);
-    }
-    .priority-dot {
-      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-    }
-    .priority-dot.high { background: var(--amber-bright); }
-    .priority-dot.med { background: var(--teal); }
-    .priority-dot.low { background: rgba(255,255,255,0.2); }
-    .app-footer {
-      padding: 1rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .app-footer-text { font-size: 11px; color: var(--slate-dim); }
-    .app-coming-badge {
-      font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
-      color: var(--amber-bright);
-      background: var(--amber-light);
-      border: var(--border-amber);
-      padding: 4px 10px; border-radius: 12px;
-    }
-
-    /* PILLARS */
-    .pillars { padding: 6rem 2rem; background: var(--ink-mid); }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--amber-bright); margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: var(--serif);
-      font-size: clamp(30px, 4vw, 50px);
-      font-weight: 400; color: var(--white);
-      line-height: 1.1; margin-bottom: 1rem;
-    }
-    .section-sub {
-      font-size: 16px; font-weight: 300;
-      color: var(--slate); line-height: 1.8;
-      max-width: 500px; margin-bottom: 3.5rem;
-    }
-    .pillars-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-    .pillar-card {
-      padding: 2.25rem 2rem;
-      border: var(--border);
-      border-radius: var(--radius-lg);
-      background: rgba(255,255,255,0.02);
-      transition: background 0.2s, border-color 0.2s;
-      position: relative; overflow: hidden;
-    }
-    .pillar-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--amber-bright), transparent);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .pillar-card:hover { background: rgba(212,134,10,0.04); border-color: var(--amber-border); }
-    .pillar-card:hover::before { opacity: 1; }
-    .pillar-num {
-      font-family: var(--mono);
-      font-size: 11px; letter-spacing: 0.1em;
-      color: var(--amber-bright); opacity: 0.5;
-      margin-bottom: 1.25rem;
-    }
-    .pillar-title {
-      font-family: var(--serif);
-      font-size: 22px; font-weight: 400;
-      color: var(--white); margin-bottom: 0.75rem;
-    }
-    .pillar-desc {
-      font-size: 14px; font-weight: 300;
-      color: var(--slate); line-height: 1.75;
-    }
-
-    /* MANIFESTO */
-    .manifesto {
-      padding: 6rem 2rem;
-      background: var(--ink);
-      text-align: center;
-      position: relative; overflow: hidden;
-    }
-    .manifesto-glow {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 700px; height: 400px;
-      background: radial-gradient(ellipse, rgba(212,134,10,0.07) 0%, transparent 70%);
-    }
-    .manifesto-quote {
-      position: relative; z-index: 1;
-      max-width: 780px; margin: 0 auto;
-    }
-    .manifesto-mark {
-      font-family: var(--serif);
-      font-size: 80px; line-height: 0.5;
-      color: var(--amber-bright); opacity: 0.25;
-      margin-bottom: 1.5rem; display: block;
-    }
-    .manifesto-text {
-      font-family: var(--serif);
-      font-size: clamp(22px, 3vw, 36px);
-      font-weight: 400; font-style: italic;
-      color: var(--white); line-height: 1.45;
-      margin-bottom: 2rem;
-    }
-    .manifesto-attr {
-      font-size: 12px; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--slate-dim);
-    }
-
-    /* NOTIFY SECTION */
-    .notify-section { padding: 7rem 2rem; text-align: center; background: var(--ink-mid); }
-    .notify-section .section-title { max-width: 560px; margin: 0 auto 1rem; }
-    .notify-section p {
-      font-size: 16px; font-weight: 300;
-      color: var(--slate); margin: 0 auto 3rem;
-      max-width: 440px; line-height: 1.8;
-    }
-    .notify-form-center {
-      display: flex; gap: 0; max-width: 420px; margin: 0 auto;
-    }
-    .notify-form-center .notify-input { border-radius: var(--radius) 0 0 var(--radius); }
-    .notify-form-center .notify-btn { border-radius: 0 var(--radius) var(--radius) 0; }
+    .cta-note { font-size: 12px; color: rgba(255,255,255,0.25); margin-top: 0.75rem; }
 
     /* FOOTER */
     footer { background: var(--ink); padding: 2.5rem 2rem; border-top: var(--border); }
@@ -371,17 +386,20 @@
       from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.75); }
+    }
 
     @media (max-width: 900px) {
-      .pillars-grid { grid-template-columns: 1fr; }
+      .use-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 768px) {
       nav { padding: 1rem 1.25rem; }
       .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
       .hero-visual { order: -1; }
       .app-card { width: 100%; max-width: 320px; }
-      .pillars, .notify-section, .manifesto { padding: 4rem 1.5rem; }
-      .notify-form-center { max-width: 100%; }
+      .features, .use-cases, .cta { padding: 4rem 1.5rem; }
     }
   </style>
 </head>
@@ -395,119 +413,182 @@
     </a>
     <div class="nav-right">
       <a href="/" class="nav-back">&larr; All ventures</a>
-      <a href="#notify" class="nav-notify">Get Early Access</a>
+      <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="nav-cta">Launch App</a>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg-texture"></div>
-    <div class="hero-glow-top"></div>
-    <div class="hero-glow-bottom"></div>
+    <div class="hero-bg"></div>
+    <div class="hero-texture"></div>
     <div class="hero-inner">
       <div>
-        <span class="hero-badge">Coming Soon &mdash; App Store</span>
-        <h1 class="hero-title"><em>High-signal</em><br>living for the<br><strong>modern operator.</strong></h1>
-        <p class="hero-sub">Tactical Vibes is the daily companion for operators who refuse to be reactive — built around clarity, intention, and disciplined execution.</p>
+        <span class="hero-badge">Web App Live &mdash; iOS Coming Soon</span>
+        <h1 class="hero-title">Build your<br>perfect setup<br><em>with confidence.</em></h1>
+        <p class="hero-sub">Find compatible optics, ammunition, and firearm accessories using a powerful compatibility database designed for shooters, builders, and gun enthusiasts.</p>
         <div class="hero-actions">
-          <div class="notify-form">
-            <input type="email" class="notify-input" placeholder="Enter your email" />
-            <button class="notify-btn" onclick="handleNotify(this)">Notify Me</button>
-          </div>
-          <p class="hero-note">Be first to know when we launch. No spam &mdash; ever.</p>
+          <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
+            Launch App &rarr;
+          </a>
+          <a href="#notify" class="btn-ghost">Notify me for iOS &darr;</a>
         </div>
       </div>
       <div class="hero-visual">
         <div class="app-card">
           <div class="app-card-header">
             <span class="app-card-title">Tactical <span>Vibes</span></span>
-            <span class="app-version">Preview</span>
+            <span class="app-live-badge">Live</span>
           </div>
           <div class="app-section">
-            <div class="app-section-label">Daily Brief</div>
-            <div class="daily-brief"><strong>Today&rsquo;s focus:</strong> Execute your top 3 with zero drift. Eliminate the noise. Move with precision.</div>
-          </div>
-          <div class="app-section">
-            <div class="app-section-label">Momentum</div>
-            <div class="metrics-row">
-              <div class="metric">
-                <div class="metric-val">7</div>
-                <div class="metric-lbl">Day streak</div>
-              </div>
-              <div class="metric">
-                <div class="metric-val">94%</div>
-                <div class="metric-lbl">Execution</div>
-              </div>
-              <div class="metric">
-                <div class="metric-val">12</div>
-                <div class="metric-lbl">Wins this wk</div>
-              </div>
+            <div class="app-section-label">Search Compatibility</div>
+            <div class="search-bar">
+              <span class="search-icon">&#x1F50D;</span>
+              <span class="search-text">AR-15 optics, 5.56 ammo, handguards...</span>
             </div>
           </div>
           <div class="app-section">
-            <div class="app-section-label">Priority Stack</div>
-            <div class="priority-list">
-              <div class="priority-item"><div class="priority-dot high"></div>Lock in Q3 consulting pipeline</div>
-              <div class="priority-item"><div class="priority-dot high"></div>App launch prep &mdash; final review</div>
-              <div class="priority-item"><div class="priority-dot med"></div>LinkedIn authority post</div>
-              <div class="priority-item"><div class="priority-dot low"></div>Weekly review &mdash; systems audit</div>
+            <div class="app-section-label">Results — Optics for AR-15 Mil-Spec</div>
+            <div class="result-item">
+              <span class="result-name">Vortex Crossfire II 2-7x32</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Leupold VX-Freedom 3-9x40</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Nightforce ATACR 4-16x42</span>
+              <span class="result-tag tag-verify">Verify Mount</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Trijicon MRO 1x25</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+          </div>
+          <div class="app-section">
+            <div class="app-section-label">Current Build</div>
+            <div class="compat-grid">
+              <div class="compat-item">
+                <div class="compat-label">Platform</div>
+                <div class="compat-val">AR-15</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Caliber</div>
+                <div class="compat-val">5.56 NATO</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Barrel</div>
+                <div class="compat-val">16&quot; Mil-Spec</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Rail</div>
+                <div class="compat-val">Picatinny</div>
+              </div>
             </div>
           </div>
           <div class="app-footer">
-            <span class="app-footer-text">Refine &middot; Prosper &middot; Ascend</span>
-            <span class="app-coming-badge">Coming Soon</span>
+            <span class="app-footer-text">tacticalvibes.base44.app</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PILLARS -->
-  <section class="pillars">
+  <!-- STATS -->
+  <div class="stats-band">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-value">DB</div>
+        <div class="stat-label">Compatibility database</div>
+      </div>
+      <div>
+        <div class="stat-value">3+</div>
+        <div class="stat-label">Categories covered</div>
+      </div>
+      <div>
+        <div class="stat-value">Web</div>
+        <div class="stat-label">Live now</div>
+      </div>
+      <div>
+        <div class="stat-value">iOS</div>
+        <div class="stat-label">Coming soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
     <div class="container">
-      <p class="section-label">Built for operators</p>
-      <h2 class="section-title">Three pillars.<br>One standard.</h2>
-      <p class="section-sub">Tactical Vibes is engineered around the mindset of those who operate at their highest level every single day — no exceptions.</p>
-      <div class="pillars-grid">
-        <div class="pillar-card">
-          <div class="pillar-num">// 01</div>
-          <p class="pillar-title">Signal over noise</p>
-          <p class="pillar-desc">Cut through the clutter. Daily briefs, priority stacks, and momentum tracking built to surface what actually matters — and nothing else.</p>
+      <p class="section-label">What it does</p>
+      <h2 class="section-title">Know before you buy.<br>Build with precision.</h2>
+      <p class="section-sub">Stop guessing whether components will work together. Tactical Vibes gives you the compatibility data you need before you spend a dollar.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F52D;</div>
+          <p class="feature-title">Optics Compatibility</p>
+          <p class="feature-desc">Find scopes, red dots, and magnifiers that fit your platform, rail system, and mount configuration.</p>
         </div>
-        <div class="pillar-card">
-          <div class="pillar-num">// 02</div>
-          <p class="pillar-title">Intentional execution</p>
-          <p class="pillar-desc">No reactive days. Tactical Vibes helps you architect your time with the same precision you'd bring to a mission-critical operation.</p>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F3AF;</div>
+          <p class="feature-title">Ammunition Matching</p>
+          <p class="feature-desc">Verify caliber compatibility, pressure ratings, and performance data for your specific firearm.</p>
         </div>
-        <div class="pillar-card">
-          <div class="pillar-num">// 03</div>
-          <p class="pillar-title">Compounding discipline</p>
-          <p class="pillar-desc">Small consistent wins stack. The app tracks your streaks, execution rates, and momentum so you can see your discipline pay dividends over time.</p>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F527;</div>
+          <p class="feature-title">Accessory Fit Check</p>
+          <p class="feature-desc">Stocks, handguards, triggers, grips — know what fits your build before ordering.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4CB;</div>
+          <p class="feature-title">Build Tracker</p>
+          <p class="feature-desc">Save your current configuration and get instant compatibility checks against your specific setup.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- MANIFESTO -->
-  <div class="manifesto">
-    <div class="manifesto-glow"></div>
-    <div class="manifesto-quote">
-      <span class="manifesto-mark">&ldquo;</span>
-      <p class="manifesto-text">The operator who controls their inputs controls their outputs. Tactical Vibes is the system that keeps you locked in when everything else is fighting for your attention.</p>
-      <p class="manifesto-attr">Refine &middot; Prosper &middot; Ascend</p>
-    </div>
-  </div>
-
-  <!-- NOTIFY -->
-  <section class="notify-section" id="notify">
+  <!-- USE CASES -->
+  <section class="use-cases">
     <div class="container">
-      <p class="section-label">Early access</p>
-      <h2 class="section-title">Be first in the stack.</h2>
-      <p>Tactical Vibes is coming to the App Store. Drop your email and you&rsquo;ll be first to know &mdash; plus get founding user access.</p>
-      <div class="notify-form-center">
-        <input type="email" class="notify-input" placeholder="your@email.com" />
+      <p class="section-label">Who it's for</p>
+      <h2 class="section-title">Built for every<br>type of builder.</h2>
+      <p class="section-sub">Whether you're a competitive shooter, weekend hobbyist, or serious builder — Tactical Vibes gives you the data to make confident decisions.</p>
+      <div class="use-grid">
+        <div class="use-card">
+          <div class="use-num">// 01</div>
+          <p class="use-title">The Builder</p>
+          <p class="use-desc">Assembling a custom AR, PCC, or precision rifle from parts? Stop cross-referencing spec sheets. Get compatibility data in one place.</p>
+        </div>
+        <div class="use-card">
+          <div class="use-num">// 02</div>
+          <p class="use-title">The Shooter</p>
+          <p class="use-desc">Upgrading your carry gun or competition setup? Know exactly which optics, triggers, and accessories work with your platform before you buy.</p>
+        </div>
+        <div class="use-card">
+          <div class="use-num">// 03</div>
+          <p class="use-title">The Enthusiast</p>
+          <p class="use-desc">Researching your next purchase or planning your collection? Use Tactical Vibes as your go-to reference for gear compatibility data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / NOTIFY -->
+  <section class="cta" id="notify">
+    <div class="container">
+      <p class="section-label">Get started</p>
+      <h2 class="section-title">Your next build starts here.</h2>
+      <p>The web app is live now — free to use. The iOS App Store version is on its way. Drop your email to be first in line.</p>
+      <div class="cta-actions">
+        <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
+          Launch Web App &rarr;
+        </a>
+      </div>
+      <div class="notify-row">
+        <input type="email" class="notify-input" placeholder="Notify me when iOS launches" />
         <button class="notify-btn" onclick="handleNotify(this)">Notify Me</button>
       </div>
+      <p class="cta-note">No spam. One email when the iOS app drops.</p>
     </div>
   </section>
 
@@ -525,15 +606,15 @@
 
   <script>
     function handleNotify(btn) {
-      const form = btn.closest('.notify-form, .notify-form-center');
-      const input = form.querySelector('input');
+      const row = btn.closest('.notify-row');
+      const input = row.querySelector('input');
       const val = input.value.trim();
       if (!val || !val.includes('@')) {
-        input.style.borderColor = 'rgba(239,99,27,0.6)';
+        input.style.borderColor = 'rgba(176,58,46,0.6)';
         input.focus();
         return;
       }
-      btn.textContent = 'You\'re on the list!';
+      btn.textContent = "You're on the list!";
       btn.style.background = '#1D9E75';
       btn.style.color = '#fff';
       btn.disabled = true;
@@ -541,5 +622,6 @@
       input.style.opacity = '0.4';
     }
   </script>
+
 </body>
 </html>
