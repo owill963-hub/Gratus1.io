@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2820;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d1810;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5DCAA5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D9E75;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="64" height="64" rx="14" ry="14" fill="url(#bgGrad)" />
+
+  <!-- Subtle border -->
+  <rect width="64" height="64" rx="14" ry="14"
+    fill="none" stroke="rgba(29,158,117,0.3)" stroke-width="1" />
+
+  <!-- G letterform — serif style, centered -->
+  <text
+    x="32"
+    y="45"
+    font-family="Palatino Linotype, Palatino, Book Antiqua, Georgia, serif"
+    font-size="40"
+    font-weight="400"
+    fill="url(#tealGrad)"
+    text-anchor="middle"
+    dominant-baseline="auto"
+    letter-spacing="-1"
+  >G</text>
+
+  <!-- Subscript 1 — bottom right corner -->
+  <text
+    x="50"
+    y="54"
+    font-family="Gill Sans, Helvetica Neue, Arial, sans-serif"
+    font-size="13"
+    font-weight="600"
+    fill="#5DCAA5"
+    text-anchor="middle"
+    opacity="0.75"
+  >1</text>
+
+</svg>
