@@ -119,9 +119,7 @@
       letter-spacing: -0.01em;
       opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
     }
-    .hero-title em {
-      font-style: italic; color: var(--teal);
-    }
+    .hero-title em { font-style: italic; color: var(--teal); }
     .hero-sub {
       font-size: 18px; font-weight: 300;
       color: var(--ink-soft); line-height: 1.75;
@@ -229,6 +227,13 @@
       padding: 2px 9px; border-radius: 20px;
       letter-spacing: 0.06em;
     }
+    .badge-review {
+      font-family: var(--sans);
+      font-size: 10px; font-weight: 500;
+      background: var(--amber); color: var(--white);
+      padding: 2px 9px; border-radius: 20px;
+      letter-spacing: 0.06em;
+    }
     .venture-desc {
       font-size: 14px; font-weight: 300;
       color: var(--ink-soft); line-height: 1.75;
@@ -242,10 +247,7 @@
     }
     .venture-link:hover { gap: 10px; }
     .venture-link.muted { color: var(--ink-soft); font-weight: 300; font-style: italic; cursor: default; }
-    .arrow {
-      display: inline-block; font-style: normal;
-      transition: transform 0.2s;
-    }
+    .arrow { display: inline-block; font-style: normal; transition: transform 0.2s; }
     .venture-link:hover .arrow { transform: translateX(3px); }
 
     /* VALUES */
@@ -292,6 +294,137 @@
     .cta-band .btn-primary:hover { background: var(--teal-mid); }
     .cta-band .btn-outline { color: var(--white); border-color: rgba(255,255,255,0.2); }
     .cta-band .btn-outline:hover { background: rgba(255,255,255,0.08); }
+
+    /* SUPPORT */
+    .support { background: var(--white); border-top: var(--border); border-bottom: var(--border); }
+    .support-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .support-block-title {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 1.25rem;
+    }
+    .support-contact-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border: var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--paper);
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    .support-contact-item:hover { background: var(--paper-dark); }
+    .support-contact-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border-radius: var(--radius);
+      background: var(--teal-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: var(--teal-dark);
+    }
+    .support-contact-label {
+      font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink-soft);
+      margin-bottom: 3px;
+    }
+    .support-contact-value {
+      font-size: 14px; font-weight: 500;
+      color: var(--ink); text-decoration: none;
+    }
+    a.support-contact-value:hover { color: var(--teal); }
+    .support-contact-note {
+      font-size: 12px; font-weight: 300;
+      color: var(--ink-soft); margin-top: 2px;
+    }
+    .support-hours-table {
+      width: 100%; border-collapse: collapse;
+    }
+    .support-hours-table tr { border-bottom: var(--border); }
+    .support-hours-table tr:last-child { border-bottom: none; }
+    .support-hours-table td {
+      padding: 10px 0; font-size: 13px;
+      font-weight: 300; color: var(--ink-soft);
+    }
+    .support-hours-table td:last-child {
+      text-align: right; font-weight: 500; color: var(--ink);
+    }
+    .support-domains {
+      border: var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .support-domain-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 1.5rem;
+      border-bottom: var(--border);
+      background: var(--paper);
+      flex-wrap: wrap; gap: 8px;
+      transition: background 0.2s;
+    }
+    .support-domain-row:last-child { border-bottom: none; }
+    .support-domain-row:hover { background: var(--paper-dark); }
+    .support-domain-name {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px; color: var(--ink);
+      font-weight: 500;
+    }
+    .support-domain-brand {
+      font-size: 12px; font-weight: 300;
+      color: var(--ink-soft);
+    }
+    .support-status {
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--teal-dark); background: var(--teal-light);
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .support-status.pending {
+      color: var(--amber-dark); background: var(--amber-light);
+    }
+    .support-products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      background: rgba(15,20,16,0.08);
+      border: var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+    .support-product-card {
+      background: var(--white);
+      padding: 1.75rem 1.5rem;
+      transition: background 0.2s;
+    }
+    .support-product-card:hover { background: var(--paper); }
+    .support-product-name {
+      font-family: var(--serif);
+      font-size: 20px; font-weight: 400;
+      color: var(--ink); margin-bottom: 0.4rem;
+    }
+    .support-product-desc {
+      font-size: 13px; font-weight: 300;
+      color: var(--ink-soft); line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .support-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px;
+      margin-right: 5px; margin-bottom: 4px;
+    }
+    .support-badge.live { color: var(--teal-dark); background: var(--teal-light); }
+    .support-badge.review { color: var(--amber-dark); background: var(--amber-light); }
+    .support-badge-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      display: inline-block;
+    }
+    .support-badge.live .support-badge-dot { background: var(--teal); }
+    .support-badge.review .support-badge-dot { background: var(--amber); }
 
     /* FOOTER */
     footer { background: var(--ink-mid); padding: 3.5rem 2rem; }
@@ -344,6 +477,8 @@
       .cta-band { padding: 4rem 1.5rem; }
       .footer-inner { flex-direction: column; }
       .ventures-grid { grid-template-columns: 1fr; }
+      .support-products-grid { grid-template-columns: 1fr; }
+      .support-domain-row { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -355,6 +490,7 @@
     <ul class="nav-links">
       <li><a href="#ventures">Ventures</a></li>
       <li><a href="#values">About</a></li>
+      <li><a href="#support">Support</a></li>
       <li><a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">Consulting</a></li>
     </ul>
     <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener" class="nav-cta">Work with us</a>
@@ -417,10 +553,12 @@
         </div>
 
         <div class="venture-card">
-          <span class="venture-tag coming">Coming Soon</span>
-          <p class="venture-name">Tactical Vibes</p>
+          <span class="venture-tag coming">In Review</span>
+          <p class="venture-name">Tactical Vibes <span class="badge-review">iOS Review</span></p>
           <p class="venture-desc">A high-signal lifestyle and strategy app for operators who move with purpose and intention every day.</p>
-          <span class="venture-link muted">App Store &mdash; coming soon</span>
+          <a href="https://tacticalvibes.gratus1.io" target="_blank" rel="noopener" class="venture-link">
+            tacticalvibes.gratus1.io <span class="arrow">&rarr;</span>
+          </a>
         </div>
 
       </div>
@@ -473,6 +611,116 @@
     </div>
   </div>
 
+  <!-- SUPPORT -->
+  <section class="support" id="support">
+    <div class="container">
+      <p class="section-label">Support</p>
+      <h2 class="section-title">How can we<br>help you?</h2>
+      <p class="section-sub">Reach out for product support, technical questions, or general inquiries. We respond within 1&ndash;2 business days.</p>
+
+      <div class="support-grid">
+
+        <!-- Contact -->
+        <div>
+          <p class="support-block-title">Contact</p>
+          <div class="support-contact-item">
+            <div class="support-contact-icon">&#9993;</div>
+            <div>
+              <p class="support-contact-label">Email support</p>
+              <a href="mailto:support@gratus1.io" class="support-contact-value">support@gratus1.io</a>
+              <p class="support-contact-note">Response within 1&ndash;2 business days</p>
+            </div>
+          </div>
+          <div class="support-contact-item">
+            <div class="support-contact-icon">&#127760;</div>
+            <div>
+              <p class="support-contact-label">Main site</p>
+              <a href="https://gratus1.io" class="support-contact-value">gratus1.io</a>
+              <p class="support-contact-note">Updates, announcements, and ventures</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hours -->
+        <div>
+          <p class="support-block-title">Support hours (ET)</p>
+          <div style="border: var(--border); border-radius: var(--radius-lg); padding: 0 1.5rem; background: var(--paper);">
+            <table class="support-hours-table">
+              <tr><td>Monday &ndash; Friday</td><td>9:00 AM &ndash; 6:00 PM</td></tr>
+              <tr><td>Saturday</td><td>10:00 AM &ndash; 2:00 PM</td></tr>
+              <tr><td>Sunday</td><td>Closed</td></tr>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Products -->
+      <p class="support-block-title">Our products &amp; brands</p>
+      <div class="support-products-grid">
+
+        <div class="support-product-card">
+          <p class="support-product-name">My Tech Buddy</p>
+          <p class="support-product-desc">AI-powered personal tech assistant for everyday users.</p>
+          <span class="support-badge live"><span class="support-badge-dot"></span>iOS &mdash; App Store</span>
+          <span class="support-badge review"><span class="support-badge-dot"></span>Android &mdash; coming soon</span>
+        </div>
+
+        <div class="support-product-card">
+          <p class="support-product-name">Tactical Vibes</p>
+          <p class="support-product-desc">High-signal lifestyle and strategy app for operators.</p>
+          <span class="support-badge live"><span class="support-badge-dot"></span>Web &mdash; live</span>
+          <span class="support-badge review"><span class="support-badge-dot"></span>iOS &mdash; in review</span>
+        </div>
+
+        <div class="support-product-card">
+          <p class="support-product-name">Vibrational Sync</p>
+          <p class="support-product-desc">Wellness, mindset, and intentional living &mdash; channel &amp; store.</p>
+          <span class="support-badge live"><span class="support-badge-dot"></span>Channel &mdash; live</span>
+          <span class="support-badge live"><span class="support-badge-dot"></span>Store &mdash; online</span>
+        </div>
+
+        <div class="support-product-card">
+          <p class="support-product-name">O Williams Consulting</p>
+          <p class="support-product-desc">IT planning, program management &amp; cybersecurity.</p>
+          <span class="support-badge live"><span class="support-badge-dot"></span>Online</span>
+        </div>
+
+      </div>
+
+      <!-- Domains -->
+      <p class="support-block-title" style="margin-top: 2.5rem;">Domains</p>
+      <div class="support-domains">
+        <div class="support-domain-row">
+          <span class="support-domain-name">gratus1.io</span>
+          <span class="support-domain-brand">Platform hub</span>
+          <span class="support-status">Online</span>
+        </div>
+        <div class="support-domain-row">
+          <span class="support-domain-name">tacticalvibes.gratus1.io</span>
+          <span class="support-domain-brand">Tactical Vibes</span>
+          <span class="support-status">Online</span>
+        </div>
+        <div class="support-domain-row">
+          <span class="support-domain-name">owilliamsconsulting.com</span>
+          <span class="support-domain-brand">O Williams Consulting</span>
+          <span class="support-status">Online</span>
+        </div>
+        <div class="support-domain-row">
+          <span class="support-domain-name">VibrationalSync.store</span>
+          <span class="support-domain-brand">Vibrational Sync &mdash; store</span>
+          <span class="support-status">Online</span>
+        </div>
+        <div class="support-domain-row">
+          <span class="support-domain-name">VibrationalSync.com</span>
+          <span class="support-domain-brand">Vibrational Sync &mdash; channel</span>
+          <span class="support-status">Online</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
@@ -484,7 +732,8 @@
         <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">O Williams Consulting</a>
         <a href="https://VibrationalSync.store" target="_blank" rel="noopener">Vibrational Sync</a>
         <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener">My Tech Buddy</a>
-        <a href="#" class="muted">Tactical Vibes</a>
+        <a href="https://tacticalvibes.gratus1.io" target="_blank" rel="noopener">Tactical Vibes</a>
+        <a href="#support">Support</a>
       </nav>
     </div>
     <p class="footer-copy">&copy; 2025 Gratus1.io &middot; All rights reserved &middot; Veteran-owned</p>
