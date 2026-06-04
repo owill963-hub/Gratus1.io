@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CWQ2X66B6L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-CWQ2X66B6L');
-</script>
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gratus1.io — Built with Intention. Scaled with Purpose.</title>
@@ -18,7 +8,6 @@
   <meta property="og:title" content="Gratus1.io" />
   <meta property="og:description" content="Built with intention. Scaled with purpose." />
   <meta property="og:url" content="https://gratus1.io" />
-
   <style>
     :root {
       --teal: #1D9E75;
@@ -44,7 +33,6 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-
     body {
       font-family: var(--sans);
       background: var(--paper);
@@ -53,123 +41,74 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* NAV */
     nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 1.25rem 3rem;
       background: rgba(247,246,242,0.94);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: var(--border);
     }
-
     .nav-logo {
       font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--ink);
-      text-decoration: none;
+      font-size: 22px; font-weight: 700;
+      color: var(--ink); text-decoration: none;
       letter-spacing: 0.01em;
     }
-
     .nav-logo span { color: var(--teal); }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--ink-soft);
-      text-decoration: none;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 12px; font-weight: 400;
+      color: var(--ink-soft); text-decoration: none;
+      letter-spacing: 0.1em; text-transform: uppercase;
       transition: color 0.2s;
     }
-
     .nav-links a:hover { color: var(--teal); }
-
     .nav-cta {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--white);
-      background: var(--teal);
-      padding: 10px 22px;
-      border-radius: var(--radius);
-      text-decoration: none;
-      letter-spacing: 0.03em;
+      font-size: 13px; font-weight: 500;
+      color: var(--white); background: var(--teal);
+      padding: 10px 22px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.03em;
       transition: background 0.2s, transform 0.15s;
       display: inline-block;
     }
+    .nav-cta:hover { background: var(--teal-dark); transform: translateY(-1px); }
 
-    .nav-cta:hover {
-      background: var(--teal-dark);
-      transform: translateY(-1px);
-    }
-
+    /* HERO */
     .hero {
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       text-align: center;
       padding: 8rem 2rem 6rem;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
-
     .hero-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
+      position: absolute; inset: 0; z-index: 0;
       background:
         radial-gradient(ellipse 70% 55% at 65% 40%, rgba(29,158,117,0.09) 0%, transparent 70%),
         radial-gradient(ellipse 45% 65% at 25% 75%, rgba(239,159,39,0.06) 0%, transparent 70%);
     }
-
     .hero-grid {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
+      position: absolute; inset: 0; z-index: 0;
       background-image:
         linear-gradient(rgba(15,20,16,0.035) 1px, transparent 1px),
         linear-gradient(90deg, rgba(15,20,16,0.035) 1px, transparent 1px);
       background-size: 60px 60px;
     }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
-    }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
 
     .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--teal);
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--teal);
       background: var(--teal-light);
-      padding: 6px 18px;
-      border-radius: 20px;
+      padding: 6px 18px; border-radius: 20px;
       margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.1s forwards;
+      opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
     }
-
     .hero-title {
       font-family: var(--serif);
       font-size: clamp(46px, 7vw, 88px);
@@ -178,144 +117,82 @@
       color: var(--ink);
       margin-bottom: 1.5rem;
       letter-spacing: -0.01em;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.25s forwards;
+      opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
     }
-
     .hero-title em {
-      font-style: italic;
-      color: var(--teal);
+      font-style: italic; color: var(--teal);
     }
-
     .hero-sub {
-      font-size: 18px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      line-height: 1.75;
-      max-width: 500px;
-      margin: 0 auto 3rem;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.4s forwards;
+      font-size: 18px; font-weight: 300;
+      color: var(--ink-soft); line-height: 1.75;
+      max-width: 500px; margin: 0 auto 3rem;
+      opacity: 0; animation: fadeUp 0.7s ease 0.4s forwards;
     }
-
     .hero-actions {
-      display: flex;
-      gap: 14px;
-      justify-content: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.55s forwards;
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.7s ease 0.55s forwards;
     }
-
-    .btn-primary,
+    .btn-primary {
+      font-family: var(--sans);
+      font-size: 14px; font-weight: 500;
+      color: var(--white); background: var(--teal);
+      padding: 15px 34px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
     .btn-outline {
       font-family: var(--sans);
-      font-size: 14px;
-      border-radius: var(--radius);
-      text-decoration: none;
-      letter-spacing: 0.02em;
+      font-size: 14px; font-weight: 400;
+      color: var(--ink); background: transparent;
+      border: var(--border);
+      padding: 15px 34px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.02em;
       transition: background 0.2s, transform 0.15s;
     }
-
-    .btn-primary {
-      font-weight: 500;
-      color: var(--white);
-      background: var(--teal);
-      padding: 15px 34px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary:hover {
-      background: var(--teal-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      font-weight: 400;
-      color: var(--ink);
-      background: transparent;
-      border: var(--border);
-      padding: 15px 34px;
-    }
-
-    .btn-outline:hover {
-      background: var(--paper-dark);
-      transform: translateY(-1px);
-    }
+    .btn-outline:hover { background: var(--paper-dark); transform: translateY(-1px); }
 
     .hero-scroll {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
       z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.85s forwards;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      opacity: 0; animation: fadeUp 0.7s ease 0.85s forwards;
     }
-
     .hero-scroll span {
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--ink-soft);
+      font-size: 10px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ink-soft);
     }
-
     .scroll-line {
-      width: 1px;
-      height: 42px;
+      width: 1px; height: 42px;
       background: linear-gradient(to bottom, var(--teal), transparent);
       animation: scrollPulse 2.2s ease infinite;
     }
 
+    /* SECTIONS */
     section { padding: 6rem 2rem; }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
+    .container { max-width: 1100px; margin: 0 auto; }
 
     .section-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 1rem;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
     }
-
     .section-title {
       font-family: var(--serif);
       font-size: clamp(32px, 4vw, 54px);
-      font-weight: 400;
-      color: var(--ink);
-      line-height: 1.1;
-      margin-bottom: 1rem;
+      font-weight: 400; color: var(--ink);
+      line-height: 1.1; margin-bottom: 1rem;
       letter-spacing: -0.01em;
     }
-
     .section-sub {
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      line-height: 1.8;
-      max-width: 520px;
-      margin-bottom: 3.5rem;
+      font-size: 16px; font-weight: 300;
+      color: var(--ink-soft); line-height: 1.8;
+      max-width: 520px; margin-bottom: 3.5rem;
     }
 
-    .ventures {
-      background: var(--white);
-      border-top: var(--border);
-      border-bottom: var(--border);
-    }
-
-    .ventures-grid,
-    .support-products-grid {
+    /* VENTURES */
+    .ventures { background: var(--white); border-top: var(--border); border-bottom: var(--border); }
+    .ventures-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1px;
@@ -324,431 +201,141 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
     }
-
     .venture-card {
       background: var(--white);
       padding: 2.25rem 2rem;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       transition: background 0.2s;
     }
-
     .venture-card:hover { background: var(--paper); }
-
     .venture-tag {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--teal-dark);
-      background: var(--teal-light);
-      padding: 4px 12px;
-      border-radius: 20px;
-      display: inline-block;
-      margin-bottom: 1.25rem;
-      align-self: flex-start;
+      color: var(--teal-dark); background: var(--teal-light);
+      padding: 4px 12px; border-radius: 20px;
+      display: inline-block; margin-bottom: 1.25rem; align-self: flex-start;
     }
-
-    .venture-tag.coming {
-      color: var(--amber-dark);
-      background: var(--amber-light);
-    }
-
+    .venture-tag.coming { color: var(--amber-dark); background: var(--amber-light); }
     .venture-name {
       font-family: var(--serif);
-      font-size: 26px;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      font-size: 26px; font-weight: 400;
+      color: var(--ink); margin-bottom: 0.6rem;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
-
-    .badge-live,
-    .badge-review {
+    .badge-live {
       font-family: var(--sans);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--white);
-      padding: 2px 9px;
-      border-radius: 20px;
+      font-size: 10px; font-weight: 500;
+      background: var(--teal); color: var(--white);
+      padding: 2px 9px; border-radius: 20px;
       letter-spacing: 0.06em;
     }
-
-    .badge-live { background: var(--teal); }
-    .badge-review { background: var(--amber); }
-
     .venture-desc {
-      font-size: 14px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      line-height: 1.75;
-      margin-bottom: 1.75rem;
-      flex: 1;
+      font-size: 14px; font-weight: 300;
+      color: var(--ink-soft); line-height: 1.75;
+      margin-bottom: 1.75rem; flex: 1;
     }
-
     .venture-link {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--teal);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 13px; font-weight: 500;
+      color: var(--teal); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
       transition: gap 0.2s;
     }
-
     .venture-link:hover { gap: 10px; }
-
+    .venture-link.muted { color: var(--ink-soft); font-weight: 300; font-style: italic; cursor: default; }
     .arrow {
-      display: inline-block;
-      font-style: normal;
+      display: inline-block; font-style: normal;
       transition: transform 0.2s;
     }
-
     .venture-link:hover .arrow { transform: translateX(3px); }
 
+    /* VALUES */
     .values { background: var(--paper); }
-
     .values-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 3rem 2rem;
     }
-
     .value-number {
       font-family: var(--serif);
-      font-size: 52px;
-      font-weight: 400;
-      color: var(--teal);
-      line-height: 1;
-      margin-bottom: 1.1rem;
-      opacity: 0.3;
+      font-size: 52px; font-weight: 400;
+      color: var(--teal); line-height: 1;
+      margin-bottom: 1.1rem; opacity: 0.3;
     }
-
     .value-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--ink);
-      margin-bottom: 0.5rem;
+      font-size: 15px; font-weight: 500;
+      color: var(--ink); margin-bottom: 0.5rem;
       letter-spacing: 0.01em;
     }
-
     .value-desc {
-      font-size: 13px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      line-height: 1.75;
+      font-size: 13px; font-weight: 300;
+      color: var(--ink-soft); line-height: 1.75;
     }
 
+    /* DIVIDER */
+    hr.divider { border: none; border-top: var(--border); }
+
+    /* CTA BAND */
     .cta-band {
       background: var(--ink);
       padding: 6rem 2rem;
       text-align: center;
     }
-
     .cta-band .section-label { color: var(--teal-mid); }
-
-    .cta-band .section-title {
-      color: var(--white);
-      max-width: 600px;
-      margin: 0 auto 1rem;
-    }
-
+    .cta-band .section-title { color: var(--white); max-width: 600px; margin: 0 auto 1rem; }
     .cta-band p {
-      font-size: 16px;
-      font-weight: 300;
+      font-size: 16px; font-weight: 300;
       color: rgba(255,255,255,0.5);
-      margin: 0 auto 2.5rem;
-      max-width: 520px;
-      line-height: 1.8;
+      margin: 0 auto 2.5rem; max-width: 520px; line-height: 1.8;
     }
+    .cta-band .hero-actions { justify-content: center; opacity: 1; animation: none; }
+    .cta-band .btn-primary { background: var(--teal); }
+    .cta-band .btn-primary:hover { background: var(--teal-mid); }
+    .cta-band .btn-outline { color: var(--white); border-color: rgba(255,255,255,0.2); }
+    .cta-band .btn-outline:hover { background: rgba(255,255,255,0.08); }
 
-    .cta-band .hero-actions {
-      justify-content: center;
-      opacity: 1;
-      animation: none;
-    }
-
-    .cta-band .btn-outline {
-      color: var(--white);
-      border-color: rgba(255,255,255,0.2);
-    }
-
-    .cta-band .btn-outline:hover {
-      background: rgba(255,255,255,0.08);
-    }
-
-    .support {
-      background: var(--white);
-      border-top: var(--border);
-      border-bottom: var(--border);
-    }
-
-    .support-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    .support-block-title {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 1.25rem;
-    }
-
-    .support-contact-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1.25rem 1.5rem;
-      border: var(--border);
-      border-radius: var(--radius-lg);
-      background: var(--paper);
-      margin-bottom: 10px;
-      transition: background 0.2s;
-    }
-
-    .support-contact-item:hover { background: var(--paper-dark); }
-
-    .support-contact-icon {
-      width: 38px;
-      height: 38px;
-      flex-shrink: 0;
-      border-radius: var(--radius);
-      background: var(--teal-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      color: var(--teal-dark);
-    }
-
-    .support-contact-label {
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-soft);
-      margin-bottom: 3px;
-    }
-
-    .support-contact-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    a.support-contact-value:hover { color: var(--teal); }
-
-    .support-contact-note {
-      font-size: 12px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      margin-top: 2px;
-    }
-
-    .support-hours-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .support-hours-table tr { border-bottom: var(--border); }
-
-    .support-hours-table tr:last-child { border-bottom: none; }
-
-    .support-hours-table td {
-      padding: 10px 0;
-      font-size: 13px;
-      font-weight: 300;
-      color: var(--ink-soft);
-    }
-
-    .support-hours-table td:last-child {
-      text-align: right;
-      font-weight: 500;
-      color: var(--ink);
-    }
-
-    .support-domains {
-      border: var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
-    .support-domain-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 1.5rem;
-      border-bottom: var(--border);
-      background: var(--paper);
-      flex-wrap: wrap;
-      gap: 8px;
-      transition: background 0.2s;
-    }
-
-    .support-domain-row:last-child { border-bottom: none; }
-
-    .support-domain-row:hover { background: var(--paper-dark); }
-
-    .support-domain-name {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 13px;
-      color: var(--ink);
-      font-weight: 500;
-    }
-
-    .support-domain-brand {
-      font-size: 12px;
-      font-weight: 300;
-      color: var(--ink-soft);
-    }
-
-    .support-status {
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--teal-dark);
-      background: var(--teal-light);
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-
-    .support-product-card {
-      background: var(--white);
-      padding: 1.75rem 1.5rem;
-      transition: background 0.2s;
-    }
-
-    .support-product-card:hover { background: var(--paper); }
-
-    .support-product-name {
-      font-family: var(--serif);
-      font-size: 20px;
-      font-weight: 400;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-
-    .support-product-desc {
-      font-size: 13px;
-      font-weight: 300;
-      color: var(--ink-soft);
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-
-    .support-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-right: 5px;
-      margin-bottom: 4px;
-    }
-
-    .support-badge.live {
-      color: var(--teal-dark);
-      background: var(--teal-light);
-    }
-
-    .support-badge.review {
-      color: var(--amber-dark);
-      background: var(--amber-light);
-    }
-
-    .support-badge-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .support-badge.live .support-badge-dot { background: var(--teal); }
-    .support-badge.review .support-badge-dot { background: var(--amber); }
-
-    footer {
-      background: var(--ink-mid);
-      padding: 3.5rem 2rem;
-    }
-
+    /* FOOTER */
+    footer { background: var(--ink-mid); padding: 3.5rem 2rem; }
     .footer-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 2rem;
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap; gap: 2rem;
     }
-
     .footer-logo {
       font-family: var(--serif);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--white);
-      text-decoration: none;
+      font-size: 22px; font-weight: 700;
+      color: var(--white); text-decoration: none;
     }
-
     .footer-logo span { color: var(--teal-mid); }
-
     .footer-tagline {
-      font-size: 11px;
-      letter-spacing: 0.14em;
+      font-size: 11px; letter-spacing: 0.14em;
       color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      margin-top: 6px;
+      text-transform: uppercase; margin-top: 6px;
     }
-
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; align-items: center; }
     .footer-links a {
-      font-size: 13px;
-      color: rgba(255,255,255,0.45);
-      text-decoration: none;
-      transition: color 0.2s;
+      font-size: 13px; color: rgba(255,255,255,0.45);
+      text-decoration: none; transition: color 0.2s;
     }
-
     .footer-links a:hover { color: var(--teal-mid); }
-
     .footer-copy {
-      width: 100%;
-      font-size: 12px;
+      width: 100%; font-size: 12px;
       color: rgba(255,255,255,0.18);
-      text-align: center;
-      margin-top: 2rem;
+      text-align: center; margin-top: 2rem;
       padding-top: 1.5rem;
       border-top: 1px solid rgba(255,255,255,0.07);
     }
 
+    /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(22px); }
-      to { opacity: 1; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes scrollPulse {
       0%, 100% { opacity: 0.3; transform: scaleY(0.95); }
-      50% { opacity: 1; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1); }
     }
 
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       nav { padding: 1rem 1.25rem; }
       .nav-links { display: none; }
@@ -757,28 +344,24 @@
       .cta-band { padding: 4rem 1.5rem; }
       .footer-inner { flex-direction: column; }
       .ventures-grid { grid-template-columns: 1fr; }
-      .support-products-grid { grid-template-columns: 1fr; }
-      .support-domain-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
     }
   </style>
 </head>
-
 <body>
 
+  <!-- NAV -->
   <nav>
     <a href="/" class="nav-logo">Gratus<span>1</span>.io</a>
     <ul class="nav-links">
       <li><a href="#ventures">Ventures</a></li>
       <li><a href="#values">About</a></li>
-      <li><a href="#support">Support</a></li>
+      <li><a href="#support">App Support</a></li>
       <li><a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">Consulting</a></li>
     </ul>
     <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener" class="nav-cta">Work with us</a>
   </nav>
 
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-grid"></div>
@@ -799,13 +382,14 @@
     </div>
   </section>
 
+  <!-- VENTURES -->
   <section class="ventures" id="ventures">
     <div class="container">
       <p class="section-label">Our ventures</p>
       <h2 class="section-title">Four brands.<br>One mission.</h2>
       <p class="section-sub">Each property serves a distinct audience &mdash; all built on the same foundation of expertise, execution, and elevation.</p>
-
       <div class="ventures-grid">
+
         <div class="venture-card">
           <span class="venture-tag">Consulting</span>
           <p class="venture-name">O Williams Consulting</p>
@@ -834,42 +418,38 @@
         </div>
 
         <div class="venture-card">
-          <span class="venture-tag coming">In Review</span>
-          <p class="venture-name">Tactical Vibes <span class="badge-review">iOS Review</span></p>
+          <span class="venture-tag coming">Coming Soon</span>
+          <p class="venture-name">Tactical Vibes</p>
           <p class="venture-desc">A high-signal lifestyle and strategy app for operators who move with purpose and intention every day.</p>
-          <a href="https://tacticalvibes.gratus1.io" target="_blank" rel="noopener" class="venture-link">
-            tacticalvibes.gratus1.io <span class="arrow">&rarr;</span>
-          </a>
+          <span class="venture-link muted">App Store &mdash; coming soon</span>
         </div>
+
       </div>
     </div>
   </section>
 
+  <!-- VALUES -->
   <section class="values" id="values">
     <div class="container">
       <p class="section-label">Why Gratus1</p>
       <h2 class="section-title">Gratitude as a<br>growth strategy.</h2>
-      <p class="section-sub">Gratus1 is the holding identity for a portfolio of brands that elevate, inform, and equip. Every venture is built on the principle that gratitude for the mission drives disciplined execution.</p>
-
+      <p class="section-sub">Gratus1 is the holding identity for a portfolio of brands that elevate, inform, and equip. Every venture is built on the principle that gratitude for the mission drives better outcomes.</p>
       <div class="values-grid">
         <div class="value-item">
           <div class="value-number">01</div>
           <p class="value-title">Veteran-owned</p>
           <p class="value-desc">20+ years of federal, Air Force, and cybersecurity leadership behind every decision made.</p>
         </div>
-
         <div class="value-item">
           <div class="value-number">02</div>
           <p class="value-title">Tech-forward</p>
           <p class="value-desc">AI-integrated products and platforms built for real-world impact &mdash; not just demos.</p>
         </div>
-
         <div class="value-item">
           <div class="value-number">03</div>
           <p class="value-title">Systems thinker</p>
           <p class="value-desc">Every brand is designed for scalability, automation, and compounding returns over time.</p>
         </div>
-
         <div class="value-item">
           <div class="value-number">04</div>
           <p class="value-title">Mission-driven</p>
@@ -879,12 +459,42 @@
     </div>
   </section>
 
+  <!-- APP SUPPORT -->
+  <section class="ventures" id="support">
+    <div class="container">
+      <p class="section-label">App support</p>
+      <h2 class="section-title">We&rsquo;ve got your six.</h2>
+      <p class="section-sub">Questions, issues, or feedback on our mobile apps? Reach out &mdash; we respond promptly. Additional support resources are available at <a href="https://VibrationalSync.store" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: none;">VibrationalSync.store</a>.</p>
+      <div class="ventures-grid">
+
+        <div class="venture-card">
+          <span class="venture-tag">Mobile App</span>
+          <p class="venture-name">My Tech Buddy</p>
+          <p class="venture-desc">Support for installation, account questions, troubleshooting, and feature requests for My Tech Buddy on iOS.</p>
+          <a href="mailto:support@gratus1.io?subject=My%20Tech%20Buddy%20Support" class="venture-link">
+            support@gratus1.io <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <div class="venture-card">
+          <span class="venture-tag">Mobile App</span>
+          <p class="venture-name">Tactical Vibes</p>
+          <p class="venture-desc">Support for installation, account questions, troubleshooting, and feature requests for Tactical Vibes on iOS.</p>
+          <a href="mailto:support@gratus1.io?subject=Tactical%20Vibes%20Support" class="venture-link">
+            support@gratus1.io <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
   <div class="cta-band">
     <div class="container">
       <p class="section-label">Let&rsquo;s connect</p>
       <h2 class="section-title">Ready to work together?</h2>
       <p>Whether you need a cybersecurity strategy, IT modernization, or CMMC compliance &mdash; O Williams Consulting delivers.</p>
-
       <div class="hero-actions">
         <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener" class="btn-primary">
           Visit O Williams Consulting <span class="arrow">&rarr;</span>
@@ -894,131 +504,22 @@
     </div>
   </div>
 
-  <section class="support" id="support">
-    <div class="container">
-      <p class="section-label">Support</p>
-      <h2 class="section-title">How can we<br>help you?</h2>
-      <p class="section-sub">Reach out for product support, technical questions, or general inquiries. We respond within 1&ndash;2 business days.</p>
-
-      <div class="support-grid">
-        <div>
-          <p class="support-block-title">Contact</p>
-
-          <div class="support-contact-item">
-            <div class="support-contact-icon">&#9993;</div>
-            <div>
-              <p class="support-contact-label">Email support</p>
-              <a href="mailto:support@gratus1.io" class="support-contact-value">support@gratus1.io</a>
-              <p class="support-contact-note">Response within 1&ndash;2 business days</p>
-            </div>
-          </div>
-
-          <div class="support-contact-item">
-            <div class="support-contact-icon">&#127760;</div>
-            <div>
-              <p class="support-contact-label">Main site</p>
-              <a href="https://gratus1.io" class="support-contact-value">gratus1.io</a>
-              <p class="support-contact-note">Updates, announcements, and ventures</p>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <p class="support-block-title">Support hours (ET)</p>
-          <div style="border: var(--border); border-radius: var(--radius-lg); padding: 0 1.5rem; background: var(--paper);">
-            <table class="support-hours-table">
-              <tr><td>Monday &ndash; Friday</td><td>9:00 AM &ndash; 6:00 PM</td></tr>
-              <tr><td>Saturday</td><td>10:00 AM &ndash; 2:00 PM</td></tr>
-              <tr><td>Sunday</td><td>Closed</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <p class="support-block-title">Our products &amp; brands</p>
-
-      <div class="support-products-grid">
-        <div class="support-product-card">
-          <p class="support-product-name">My Tech Buddy</p>
-          <p class="support-product-desc">AI-powered personal tech assistant for everyday users.</p>
-          <span class="support-badge live"><span class="support-badge-dot"></span>iOS &mdash; App Store</span>
-          <span class="support-badge review"><span class="support-badge-dot"></span>Android &mdash; coming soon</span>
-        </div>
-
-        <div class="support-product-card">
-          <p class="support-product-name">Tactical Vibes</p>
-          <p class="support-product-desc">High-signal lifestyle and strategy app for operators.</p>
-          <span class="support-badge live"><span class="support-badge-dot"></span>Web &mdash; live</span>
-          <span class="support-badge review"><span class="support-badge-dot"></span>iOS &mdash; in review</span>
-        </div>
-
-        <div class="support-product-card">
-          <p class="support-product-name">Vibrational Sync</p>
-          <p class="support-product-desc">Wellness, mindset, and intentional living &mdash; channel &amp; store.</p>
-          <span class="support-badge live"><span class="support-badge-dot"></span>Channel &mdash; live</span>
-          <span class="support-badge live"><span class="support-badge-dot"></span>Store &mdash; online</span>
-        </div>
-
-        <div class="support-product-card">
-          <p class="support-product-name">O Williams Consulting</p>
-          <p class="support-product-desc">IT planning, program management &amp; cybersecurity.</p>
-          <span class="support-badge live"><span class="support-badge-dot"></span>Online</span>
-        </div>
-      </div>
-
-      <p class="support-block-title" style="margin-top: 2.5rem;">Domains</p>
-
-      <div class="support-domains">
-        <div class="support-domain-row">
-          <span class="support-domain-name">gratus1.io</span>
-          <span class="support-domain-brand">Platform hub</span>
-          <span class="support-status">Online</span>
-        </div>
-
-        <div class="support-domain-row">
-          <span class="support-domain-name">tacticalvibes.gratus1.io</span>
-          <span class="support-domain-brand">Tactical Vibes</span>
-          <span class="support-status">Online</span>
-        </div>
-
-        <div class="support-domain-row">
-          <span class="support-domain-name">owilliamsconsulting.com</span>
-          <span class="support-domain-brand">O Williams Consulting</span>
-          <span class="support-status">Online</span>
-        </div>
-
-        <div class="support-domain-row">
-          <span class="support-domain-name">VibrationalSync.store</span>
-          <span class="support-domain-brand">Vibrational Sync &mdash; store</span>
-          <span class="support-status">Online</span>
-        </div>
-
-        <div class="support-domain-row">
-          <span class="support-domain-name">VibrationalSync.com</span>
-          <span class="support-domain-brand">Vibrational Sync &mdash; channel</span>
-          <span class="support-status">Online</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
       <div>
         <a href="/" class="footer-logo">Gratus<span>1</span>.io</a>
         <p class="footer-tagline">Refine &middot; Prosper &middot; Ascend</p>
       </div>
-
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">O Williams Consulting</a>
         <a href="https://VibrationalSync.store" target="_blank" rel="noopener">Vibrational Sync</a>
         <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener">My Tech Buddy</a>
-        <a href="https://tacticalvibes.gratus1.io" target="_blank" rel="noopener">Tactical Vibes</a>
-        <a href="#support">Support</a>
+        <a href="#" class="muted">Tactical Vibes</a>
+        <a href="mailto:support@gratus1.io">App Support: support@gratus1.io</a>
       </nav>
-
-      <p class="footer-copy">&copy; 2026 Gratus1.io &middot; All rights reserved &middot; Veteran-owned</p>
     </div>
+    <p class="footer-copy">&copy; 2025 Gratus1.io &middot; All rights reserved &middot; Veteran-owned</p>
   </footer>
 
 </body>
