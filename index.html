@@ -12,6 +12,7 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <style>
     :root {
       --teal: #1D9E75;
@@ -28,7 +29,7 @@
       --paper-mid: #eeede8;
       --paper-dark: #e4e3dc;
       --white: #ffffff;
-      --serif: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Hoefler Text', Garamond, 'Times New Roman', serif;
+      --serif: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Hoefler Text', Garamond, serif;
       --sans: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       --border: 1px solid rgba(15,20,16,0.1);
       --radius: 4px;
@@ -103,7 +104,6 @@
       background-size: 60px 60px;
     }
     .hero-content { position: relative; z-index: 1; max-width: 800px; }
-
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
@@ -116,16 +116,12 @@
     .hero-title {
       font-family: var(--serif);
       font-size: clamp(46px, 7vw, 88px);
-      font-weight: 400;
-      line-height: 1.05;
-      color: var(--ink);
-      margin-bottom: 1.5rem;
+      font-weight: 400; line-height: 1.05;
+      color: var(--ink); margin-bottom: 1.5rem;
       letter-spacing: -0.01em;
       opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
     }
-    .hero-title em {
-      font-style: italic; color: var(--teal);
-    }
+    .hero-title em { font-style: italic; color: var(--teal); }
     .hero-sub {
       font-size: 18px; font-weight: 300;
       color: var(--ink-soft); line-height: 1.75;
@@ -156,7 +152,6 @@
       transition: background 0.2s, transform 0.15s;
     }
     .btn-outline:hover { background: var(--paper-dark); transform: translateY(-1px); }
-
     .hero-scroll {
       position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
       z-index: 1;
@@ -176,7 +171,6 @@
     /* SECTIONS */
     section { padding: 6rem 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
-
     .section-label {
       font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
       text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
@@ -219,7 +213,9 @@
       padding: 4px 12px; border-radius: 20px;
       display: inline-block; margin-bottom: 1.25rem; align-self: flex-start;
     }
-    .venture-tag.coming { color: var(--amber-dark); background: var(--amber-light); }
+    .venture-tag.live-web {
+      color: #633806; background: var(--amber-light);
+    }
     .venture-name {
       font-family: var(--serif);
       font-size: 26px; font-weight: 400;
@@ -230,6 +226,13 @@
       font-family: var(--sans);
       font-size: 10px; font-weight: 500;
       background: var(--teal); color: var(--white);
+      padding: 2px 9px; border-radius: 20px;
+      letter-spacing: 0.06em;
+    }
+    .badge-web {
+      font-family: var(--sans);
+      font-size: 10px; font-weight: 500;
+      background: var(--amber); color: var(--white);
       padding: 2px 9px; border-radius: 20px;
       letter-spacing: 0.06em;
     }
@@ -245,11 +248,8 @@
       transition: gap 0.2s;
     }
     .venture-link:hover { gap: 10px; }
-    .venture-link.muted { color: var(--ink-soft); font-weight: 300; font-style: italic; cursor: default; }
-    .arrow {
-      display: inline-block; font-style: normal;
-      transition: transform 0.2s;
-    }
+    .venture-link.amber { color: #C17A2A; }
+    .arrow { display: inline-block; transition: transform 0.2s; }
     .venture-link:hover .arrow { transform: translateX(3px); }
 
     /* VALUES */
@@ -268,22 +268,16 @@
     .value-title {
       font-size: 15px; font-weight: 500;
       color: var(--ink); margin-bottom: 0.5rem;
-      letter-spacing: 0.01em;
     }
     .value-desc {
       font-size: 13px; font-weight: 300;
       color: var(--ink-soft); line-height: 1.75;
     }
 
-    /* DIVIDER */
     hr.divider { border: none; border-top: var(--border); }
 
     /* CTA BAND */
-    .cta-band {
-      background: var(--ink);
-      padding: 6rem 2rem;
-      text-align: center;
-    }
+    .cta-band { background: var(--ink); padding: 6rem 2rem; text-align: center; }
     .cta-band .section-label { color: var(--teal-mid); }
     .cta-band .section-title { color: var(--white); max-width: 600px; margin: 0 auto 1rem; }
     .cta-band p {
@@ -329,17 +323,15 @@
       border-top: 1px solid rgba(255,255,255,0.07);
     }
 
-    /* ANIMATIONS */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; transform: scaleY(0.95); }
-      50%       { opacity: 1;   transform: scaleY(1); }
+      0%, 100% { opacity: 0.3; }
+      50%       { opacity: 1; }
     }
 
-    /* RESPONSIVE */
     @media (max-width: 768px) {
       nav { padding: 1rem 1.25rem; }
       .nav-links { display: none; }
@@ -416,16 +408,18 @@
           <span class="venture-tag">Mobile App</span>
           <p class="venture-name">My Tech Buddy <span class="badge-live">Live</span></p>
           <p class="venture-desc">Your AI-powered personal tech assistant &mdash; making technology approachable and intuitive for everyday users.</p>
-          <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener" class="venture-link">
-            Download on the App Store <span class="arrow">&rarr;</span>
+          <a href="/mytechbuddy.html" class="venture-link">
+            Learn more <span class="arrow">&rarr;</span>
           </a>
         </div>
 
         <div class="venture-card">
-          <span class="venture-tag coming">Coming Soon</span>
-          <p class="venture-name">Tactical Vibes</p>
-          <p class="venture-desc">A high-signal lifestyle and strategy app for operators who move with purpose and intention every day.</p>
-          <span class="venture-link muted">App Store &mdash; coming soon</span>
+          <span class="venture-tag live-web">Web App</span>
+          <p class="venture-name">Tactical Vibes <span class="badge-web">Live</span></p>
+          <p class="venture-desc">Build your perfect setup with confidence. Find compatible optics, ammunition, and firearm accessories using a powerful firearm compatibility database.</p>
+          <a href="/tacticalvibes.html" class="venture-link amber">
+            Learn more <span class="arrow">&rarr;</span>
+          </a>
         </div>
 
       </div>
@@ -468,7 +462,7 @@
     <div class="container">
       <p class="section-label">App support</p>
       <h2 class="section-title">We&rsquo;ve got your six.</h2>
-      <p class="section-sub">Questions, issues, or feedback on our mobile apps? Reach out &mdash; we respond promptly. Additional support resources are available at <a href="https://VibrationalSync.store" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: none;">VibrationalSync.store</a>.</p>
+      <p class="section-sub">Questions, issues, or feedback on our apps? Reach out &mdash; we respond promptly. Additional support resources are available at <a href="https://VibrationalSync.store" target="_blank" rel="noopener" style="color: var(--teal); text-decoration: none;">VibrationalSync.store</a>.</p>
       <div class="ventures-grid">
 
         <div class="venture-card">
@@ -481,9 +475,9 @@
         </div>
 
         <div class="venture-card">
-          <span class="venture-tag">Mobile App</span>
+          <span class="venture-tag live-web">Web App</span>
           <p class="venture-name">Tactical Vibes</p>
-          <p class="venture-desc">Support for installation, account questions, troubleshooting, and feature requests for Tactical Vibes on iOS.</p>
+          <p class="venture-desc">Support for account questions, troubleshooting, and feature requests for the Tactical Vibes web app and upcoming iOS release.</p>
           <a href="mailto:support@gratus1.io?subject=Tactical%20Vibes%20Support" class="venture-link">
             support@gratus1.io <span class="arrow">&rarr;</span>
           </a>
@@ -518,8 +512,8 @@
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">O Williams Consulting</a>
         <a href="https://VibrationalSync.store" target="_blank" rel="noopener">Vibrational Sync</a>
-        <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener">My Tech Buddy</a>
-        <a href="#" class="muted">Tactical Vibes</a>
+        <a href="/mytechbuddy.html">My Tech Buddy</a>
+        <a href="/tacticalvibes.html">Tactical Vibes</a>
         <a href="mailto:support@gratus1.io">App Support: support@gratus1.io</a>
       </nav>
     </div>

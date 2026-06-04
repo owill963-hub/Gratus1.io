@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tactical Vibes — Firearm Compatibility Database for Shooters & Builders</title>
+  <meta name="description" content="Build your perfect setup with confidence. Find compatible optics, ammunition, and firearm accessories using a powerful firearm compatibility database designed for shooters, builders, and gun enthusiasts." />
+  <meta property="og:title" content="Tactical Vibes" />
+  <meta property="og:description" content="Build your perfect setup with confidence. Find compatible optics, ammunition, and firearm accessories." />
+  <meta property="og:url" content="https://gratus1.io/tacticalvibes" />
+  <style>
+    :root {
+      --amber: #C17A2A;
+      --amber-bright: #D4921F;
+      --amber-light: rgba(193,122,42,0.12);
+      --amber-border: rgba(193,122,42,0.25);
+      --red: #B03A2E;
+      --red-light: rgba(176,58,46,0.1);
+      --ink: #080908;
+      --ink-mid: #0f1210;
+      --ink-soft: #1e2620;
+      --slate: rgba(255,255,255,0.5);
+      --slate-dim: rgba(255,255,255,0.25);
+      --white: #ffffff;
+      --teal: #1D9E75;
+      --teal-mid: #5DCAA5;
+      --border: 1px solid rgba(255,255,255,0.06);
+      --border-amber: 1px solid rgba(193,122,42,0.22);
+      --radius: 6px;
+      --radius-lg: 12px;
+      --serif: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Hoefler Text', Garamond, serif;
+      --sans: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --mono: 'Courier New', Courier, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--ink);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 3rem;
+      background: rgba(8,9,8,0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: var(--border);
+    }
+    .nav-logo { text-decoration: none; display: flex; flex-direction: column; }
+    .nav-logo-main {
+      font-family: var(--serif);
+      font-size: 18px; font-weight: 700;
+      color: var(--white); letter-spacing: 0.01em;
+    }
+    .nav-logo-main span { color: var(--teal-mid); }
+    .nav-logo-sub {
+      font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      margin-top: 1px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 2rem; }
+    .nav-back {
+      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--amber-bright); }
+    .nav-cta {
+      font-size: 13px; font-weight: 600;
+      color: var(--ink); background: var(--amber-bright);
+      padding: 10px 22px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.03em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { background: var(--amber); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 8rem 2rem 5rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 75% 35%, rgba(193,122,42,0.1) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 50% at 15% 75%, rgba(176,58,46,0.06) 0%, transparent 65%);
+    }
+    .hero-texture {
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.012) 0px,
+        rgba(255,255,255,0.012) 1px,
+        transparent 1px,
+        transparent 14px
+      );
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+      max-width: 1100px; margin: 0 auto; width: 100%;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--amber-bright);
+      border: var(--border-amber);
+      background: var(--amber-light);
+      padding: 6px 16px; border-radius: 20px;
+      margin-bottom: 1.75rem;
+      opacity: 0; animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--amber-bright); border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(38px, 5vw, 68px);
+      font-weight: 400; line-height: 1.05;
+      color: var(--white); margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+      opacity: 0; animation: fadeUp 0.7s ease 0.25s forwards;
+    }
+    .hero-title em { font-style: italic; color: var(--amber-bright); }
+    .hero-sub {
+      font-size: 17px; font-weight: 300;
+      color: var(--slate); line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0; animation: fadeUp 0.7s ease 0.4s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+      opacity: 0; animation: fadeUp 0.7s ease 0.55s forwards;
+    }
+    .btn-launch {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600;
+      color: var(--ink); background: var(--amber-bright);
+      padding: 15px 32px; border-radius: var(--radius);
+      text-decoration: none; letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-launch:hover { background: var(--amber); transform: translateY(-2px); }
+    .btn-ghost {
+      font-size: 14px; font-weight: 400;
+      color: rgba(255,255,255,0.45); text-decoration: none;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--amber-bright); border-color: var(--amber-bright); }
+
+    /* APP PREVIEW */
+    .hero-visual {
+      display: flex; justify-content: center;
+      opacity: 0; animation: fadeUp 0.8s ease 0.45s forwards;
+    }
+    .app-card {
+      width: 320px;
+      background: linear-gradient(160deg, #141a12 0%, #0b0e09 100%);
+      border: var(--border-amber);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(193,122,42,0.06);
+    }
+    .app-card-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-card-title {
+      font-family: var(--serif);
+      font-size: 17px; font-weight: 500;
+      color: var(--white);
+    }
+    .app-card-title span { color: var(--amber-bright); }
+    .app-live-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--ink); background: var(--amber-bright);
+      padding: 3px 9px; border-radius: 10px;
+      text-transform: uppercase;
+    }
+    .app-section { padding: 1.1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .app-section-label {
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--amber-bright); margin-bottom: 0.65rem; opacity: 0.65;
+    }
+    .search-bar {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .search-icon { font-size: 13px; opacity: 0.4; }
+    .search-text { font-size: 12px; color: rgba(255,255,255,0.3); }
+    .result-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px;
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-name { color: rgba(255,255,255,0.8); font-weight: 400; }
+    .result-tag {
+      font-size: 10px; padding: 2px 8px; border-radius: 8px;
+      font-weight: 500; letter-spacing: 0.04em;
+    }
+    .tag-compatible { background: rgba(29,158,117,0.15); color: #5DCAA5; }
+    .tag-verify { background: var(--amber-light); color: var(--amber-bright); }
+    .tag-incompatible { background: var(--red-light); color: #e07060; }
+    .compat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .compat-item {
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    .compat-label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+    .compat-val { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: 400; }
+    .app-footer {
+      padding: 0.9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-footer-text { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+    /* FEATURES */
+    .features { padding: 6rem 2rem; background: var(--ink-mid); }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--amber-bright); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 400; color: var(--white);
+      line-height: 1.1; margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-size: 16px; font-weight: 300;
+      color: var(--slate); line-height: 1.8;
+      max-width: 520px; margin-bottom: 3.5rem;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px; background: rgba(255,255,255,0.04);
+      border: var(--border); border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .feature-card {
+      padding: 2.25rem 2rem;
+      background: var(--ink-mid);
+      transition: background 0.2s;
+    }
+    .feature-card:hover { background: rgba(193,122,42,0.04); }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--amber-light);
+      border: var(--border-amber);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 1.25rem;
+    }
+    .feature-title { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 13px; font-weight: 300; color: var(--slate); line-height: 1.7; }
+
+    /* USE CASES */
+    .use-cases { padding: 6rem 2rem; background: var(--ink); }
+    .use-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .use-card {
+      padding: 2rem 1.75rem;
+      border: var(--border);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.02);
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .use-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--amber-bright), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .use-card:hover { border-color: var(--amber-border); background: rgba(193,122,42,0.03); }
+    .use-card:hover::after { opacity: 1; }
+    .use-num {
+      font-family: var(--mono);
+      font-size: 11px; letter-spacing: 0.1em;
+      color: var(--amber-bright); opacity: 0.45;
+      margin-bottom: 1.1rem;
+    }
+    .use-title {
+      font-family: var(--serif);
+      font-size: 20px; font-weight: 400;
+      color: var(--white); margin-bottom: 0.65rem;
+    }
+    .use-desc {
+      font-size: 13px; font-weight: 300;
+      color: var(--slate); line-height: 1.75;
+    }
+
+    /* STATS */
+    .stats-band {
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, rgba(193,122,42,0.1) 0%, rgba(193,122,42,0.03) 100%);
+      border-top: var(--border-amber);
+      border-bottom: var(--border-amber);
+    }
+    .stats-grid {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 2rem; text-align: center;
+    }
+    .stat-value {
+      font-family: var(--serif);
+      font-size: 48px; font-weight: 400;
+      color: var(--amber-bright); line-height: 1; margin-bottom: 0.5rem;
+    }
+    .stat-label {
+      font-size: 12px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35);
+    }
+
+    /* CTA */
+    .cta { padding: 7rem 2rem; text-align: center; background: var(--ink-mid); }
+    .cta .section-title { max-width: 580px; margin: 0 auto 1rem; }
+    .cta p {
+      font-size: 16px; font-weight: 300;
+      color: var(--slate); margin: 0 auto 2.5rem;
+      max-width: 480px; line-height: 1.8;
+    }
+    .cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .notify-row {
+      display: flex; gap: 0; max-width: 400px; margin: 1rem auto 0;
+    }
+    .notify-input {
+      flex: 1; padding: 13px 18px;
+      background: rgba(255,255,255,0.05);
+      border: var(--border-amber); border-right: none;
+      border-radius: var(--radius) 0 0 var(--radius);
+      color: var(--white); font-family: var(--sans); font-size: 14px;
+      outline: none;
+    }
+    .notify-input::placeholder { color: rgba(255,255,255,0.25); }
+    .notify-input:focus { background: rgba(255,255,255,0.08); }
+    .notify-btn {
+      padding: 13px 22px;
+      background: var(--amber-bright); color: var(--ink);
+      border: none; cursor: pointer;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-family: var(--sans); font-size: 13px; font-weight: 600;
+      letter-spacing: 0.04em; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .notify-btn:hover { background: var(--amber); }
+    .cta-note { font-size: 12px; color: rgba(255,255,255,0.25); margin-top: 0.75rem; }
+
+    /* FOOTER */
+    footer { background: var(--ink); padding: 2.5rem 2rem; border-top: var(--border); }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-left { font-size: 13px; color: rgba(255,255,255,0.25); }
+    .footer-left a { color: var(--teal-mid); text-decoration: none; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--amber-bright); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.75); }
+    }
+
+    @media (max-width: 900px) {
+      .use-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .hero-visual { order: -1; }
+      .app-card { width: 100%; max-width: 320px; }
+      .features, .use-cases, .cta { padding: 4rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-main">Gratus<span>1</span>.io</span>
+      <span class="nav-logo-sub">Tactical Vibes</span>
+    </a>
+    <div class="nav-right">
+      <a href="/" class="nav-back">&larr; All ventures</a>
+      <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="nav-cta">Launch App</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-texture"></div>
+    <div class="hero-inner">
+      <div>
+        <span class="hero-badge">Web App Live &mdash; iOS Coming Soon</span>
+        <h1 class="hero-title">Build your<br>perfect setup<br><em>with confidence.</em></h1>
+        <p class="hero-sub">Find compatible optics, ammunition, and firearm accessories using a powerful compatibility database designed for shooters, builders, and gun enthusiasts.</p>
+        <div class="hero-actions">
+          <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
+            Launch App &rarr;
+          </a>
+          <a href="#notify" class="btn-ghost">Notify me for iOS &darr;</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="app-card">
+          <div class="app-card-header">
+            <span class="app-card-title">Tactical <span>Vibes</span></span>
+            <span class="app-live-badge">Live</span>
+          </div>
+          <div class="app-section">
+            <div class="app-section-label">Search Compatibility</div>
+            <div class="search-bar">
+              <span class="search-icon">&#x1F50D;</span>
+              <span class="search-text">AR-15 optics, 5.56 ammo, handguards...</span>
+            </div>
+          </div>
+          <div class="app-section">
+            <div class="app-section-label">Results — Optics for AR-15 Mil-Spec</div>
+            <div class="result-item">
+              <span class="result-name">Vortex Crossfire II 2-7x32</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Leupold VX-Freedom 3-9x40</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Nightforce ATACR 4-16x42</span>
+              <span class="result-tag tag-verify">Verify Mount</span>
+            </div>
+            <div class="result-item">
+              <span class="result-name">Trijicon MRO 1x25</span>
+              <span class="result-tag tag-compatible">Compatible</span>
+            </div>
+          </div>
+          <div class="app-section">
+            <div class="app-section-label">Current Build</div>
+            <div class="compat-grid">
+              <div class="compat-item">
+                <div class="compat-label">Platform</div>
+                <div class="compat-val">AR-15</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Caliber</div>
+                <div class="compat-val">5.56 NATO</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Barrel</div>
+                <div class="compat-val">16&quot; Mil-Spec</div>
+              </div>
+              <div class="compat-item">
+                <div class="compat-label">Rail</div>
+                <div class="compat-val">Picatinny</div>
+              </div>
+            </div>
+          </div>
+          <div class="app-footer">
+            <span class="app-footer-text">tacticalvibes.base44.app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-band">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-value">DB</div>
+        <div class="stat-label">Compatibility database</div>
+      </div>
+      <div>
+        <div class="stat-value">3+</div>
+        <div class="stat-label">Categories covered</div>
+      </div>
+      <div>
+        <div class="stat-value">Web</div>
+        <div class="stat-label">Live now</div>
+      </div>
+      <div>
+        <div class="stat-value">iOS</div>
+        <div class="stat-label">Coming soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="container">
+      <p class="section-label">What it does</p>
+      <h2 class="section-title">Know before you buy.<br>Build with precision.</h2>
+      <p class="section-sub">Stop guessing whether components will work together. Tactical Vibes gives you the compatibility data you need before you spend a dollar.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F52D;</div>
+          <p class="feature-title">Optics Compatibility</p>
+          <p class="feature-desc">Find scopes, red dots, and magnifiers that fit your platform, rail system, and mount configuration.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F3AF;</div>
+          <p class="feature-title">Ammunition Matching</p>
+          <p class="feature-desc">Verify caliber compatibility, pressure ratings, and performance data for your specific firearm.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F527;</div>
+          <p class="feature-title">Accessory Fit Check</p>
+          <p class="feature-desc">Stocks, handguards, triggers, grips — know what fits your build before ordering.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#x1F4CB;</div>
+          <p class="feature-title">Build Tracker</p>
+          <p class="feature-desc">Save your current configuration and get instant compatibility checks against your specific setup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="use-cases">
+    <div class="container">
+      <p class="section-label">Who it's for</p>
+      <h2 class="section-title">Built for every<br>type of builder.</h2>
+      <p class="section-sub">Whether you're a competitive shooter, weekend hobbyist, or serious builder — Tactical Vibes gives you the data to make confident decisions.</p>
+      <div class="use-grid">
+        <div class="use-card">
+          <div class="use-num">// 01</div>
+          <p class="use-title">The Builder</p>
+          <p class="use-desc">Assembling a custom AR, PCC, or precision rifle from parts? Stop cross-referencing spec sheets. Get compatibility data in one place.</p>
+        </div>
+        <div class="use-card">
+          <div class="use-num">// 02</div>
+          <p class="use-title">The Shooter</p>
+          <p class="use-desc">Upgrading your carry gun or competition setup? Know exactly which optics, triggers, and accessories work with your platform before you buy.</p>
+        </div>
+        <div class="use-card">
+          <div class="use-num">// 03</div>
+          <p class="use-title">The Enthusiast</p>
+          <p class="use-desc">Researching your next purchase or planning your collection? Use Tactical Vibes as your go-to reference for gear compatibility data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA / NOTIFY -->
+  <section class="cta" id="notify">
+    <div class="container">
+      <p class="section-label">Get started</p>
+      <h2 class="section-title">Your next build starts here.</h2>
+      <p>The web app is live now — free to use. The iOS App Store version is on its way. Drop your email to be first in line.</p>
+      <div class="cta-actions">
+        <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
+          Launch Web App &rarr;
+        </a>
+      </div>
+      <div class="notify-row">
+        <input type="email" class="notify-input" placeholder="Notify me when iOS launches" />
+        <button class="notify-btn" onclick="handleNotify(this)">Notify Me</button>
+      </div>
+      <p class="cta-note">No spam. One email when the iOS app drops.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <p class="footer-left">A <a href="/">Gratus1.io</a> venture &middot; Veteran-owned</p>
+      <nav class="footer-links">
+        <a href="/">Home</a>
+        <a href="/mytechbuddy.html">My Tech Buddy</a>
+        <a href="https://owilliamsconsulting.com" target="_blank" rel="noopener">Consulting</a>
+        <a href="mailto:support@gratus1.io?subject=Tactical%20Vibes%20Support">Support: support@gratus1.io</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    function handleNotify(btn) {
+      const row = btn.closest('.notify-row');
+      const input = row.querySelector('input');
+      const val = input.value.trim();
+      if (!val || !val.includes('@')) {
+        input.style.borderColor = 'rgba(176,58,46,0.6)';
+        input.focus();
+        return;
+      }
+      btn.textContent = "You're on the list!";
+      btn.style.background = '#1D9E75';
+      btn.style.color = '#fff';
+      btn.disabled = true;
+      input.disabled = true;
+      input.style.opacity = '0.4';
+    }
+  </script>
+
+</body>
+</html>
