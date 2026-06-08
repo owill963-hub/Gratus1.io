@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gratus1.io/sitemap.xml
