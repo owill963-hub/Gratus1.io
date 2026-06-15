@@ -440,7 +440,7 @@
     </a>
     <div class="nav-right">
       <a href="/" class="nav-back">&larr; All ventures</a>
-      <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="nav-cta">Launch App</a>
+      <a href="https://apps.apple.com/us/app/tactical-vibes/id6776399589" target="_blank" rel="noopener" class="nav-cta">Get on App Store</a>
     </div>
   </nav>
 
@@ -450,14 +450,14 @@
     <div class="hero-texture"></div>
     <div class="hero-inner">
       <div>
-        <span class="hero-badge">Web App Live &mdash; iOS Coming Soon</span>
+        <span class="hero-badge">Now Live &mdash; Web App &amp; iOS App Store</span>
         <h1 class="hero-title">Build your<br>perfect setup<br><em>with confidence.</em></h1>
         <p class="hero-sub">Find compatible optics, ammunition, and firearm accessories using a powerful compatibility database designed for shooters, builders, and gun enthusiasts.</p>
         <div class="hero-actions">
-          <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
-            Launch App &rarr;
+          <a href="https://apps.apple.com/us/app/tactical-vibes/id6776399589" target="_blank" rel="noopener" class="btn-launch">
+            Download on App Store &rarr;
           </a>
-          <a href="#notify" class="btn-ghost">Notify me for iOS &darr;</a>
+          <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-ghost">Launch Web App</a>
         </div>
       </div>
       <div class="hero-visual">
@@ -538,7 +538,7 @@
       </div>
       <div>
         <div class="stat-value">iOS</div>
-        <div class="stat-label">Coming soon</div>
+        <div class="stat-label">App Store</div>
       </div>
     </div>
   </div>
@@ -600,22 +600,18 @@
     </div>
   </section>
 
-  <!-- CTA / NOTIFY -->
-  <section class="cta" id="notify">
+  <!-- CTA -->
+  <section class="cta" id="download">
     <div class="container">
       <p class="section-label">Get started</p>
       <h2 class="section-title">Your next build starts here.</h2>
-      <p>The web app is live now — free to use. The iOS App Store version is on its way. Drop your email to be first in line.</p>
+      <p>Available now on iOS and the web — free to use. Download the app and start building with confidence.</p>
       <div class="cta-actions">
-        <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-launch">
-          Launch Web App &rarr;
+        <a href="https://apps.apple.com/us/app/tactical-vibes/id6776399589" target="_blank" rel="noopener" class="btn-launch">
+          Download on App Store &rarr;
         </a>
+        <a href="https://tacticalvibes.base44.app" target="_blank" rel="noopener" class="btn-ghost">Launch Web App</a>
       </div>
-      <div class="notify-row">
-        <input type="email" class="notify-input" placeholder="Notify me when iOS launches" />
-        <button class="notify-btn" onclick="handleNotify(this)">Notify Me</button>
-      </div>
-      <p class="cta-note">No spam. One email when the iOS app drops.</p>
     </div>
   </section>
 
@@ -632,24 +628,6 @@
     </div>
   </footer>
 
-  <script>
-    function handleNotify(btn) {
-      const row = btn.closest('.notify-row');
-      const input = row.querySelector('input');
-      const val = input.value.trim();
-      if (!val || !val.includes('@')) {
-        input.style.borderColor = 'rgba(176,58,46,0.6)';
-        input.focus();
-        return;
-      }
-      btn.textContent = "You're on the list!";
-      btn.style.background = '#1D9E75';
-      btn.style.color = '#fff';
-      btn.disabled = true;
-      input.disabled = true;
-      input.style.opacity = '0.4';
-    }
-  </script>
 
 </body>
 </html>
