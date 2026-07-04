@@ -1,9 +1,9 @@
 /**
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
- * Pixel: 4105495123013406 | Endpoint: POST /capi
+ * Pixel: 1356026399874586 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
  */
-const PIXEL_ID = "4105495123013406";
+const PIXEL_ID = "1356026399874586";
 const GRAPH_VERSION = "v21.0";
 const ALLOWED_HOST_SUFFIX = "gratus1.io";
 
@@ -85,6 +85,9 @@ async function handleCapi(request, env) {
     }
   );
   const result = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    console.log("CAPI_ERROR", JSON.stringify({status: resp.status, error: result.error && {message: result.error.message, type: result.error.type, code: result.error.code, subcode: result.error.error_subcode}}));
+  }
   return json(
     { ok: resp.ok, events_received: result.events_received, fbtrace_id: result.fbtrace_id },
     resp.ok ? 200 : 502
