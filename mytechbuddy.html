@@ -116,7 +116,25 @@
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', '4105495123013406');
-  fbq('track', 'PageView');
+  (function(){
+    var eid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID()
+            : 'ev.' + Date.now() + '.' + Math.random().toString(36).slice(2);
+    fbq('track', 'PageView', {}, {eventID: eid});
+    var payload = JSON.stringify({
+      event_name: 'PageView',
+      event_id: eid,
+      event_source_url: location.href,
+      fbp: (document.cookie.match(/_fbp=([^;]+)/) || [])[1],
+      fbc: (document.cookie.match(/_fbc=([^;]+)/) || [])[1]
+    });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/capi', new Blob([payload], {type: 'application/json'}));
+      } else {
+        fetch('/capi', {method:'POST', headers:{'content-type':'application/json'}, body: payload, keepalive: true});
+      }
+    } catch (e) {}
+  })();
   </script>
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=4105495123013406&ev=PageView&noscript=1"
