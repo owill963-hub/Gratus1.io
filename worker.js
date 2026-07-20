@@ -1,21 +1,67 @@
 /**
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
+ *   + private gate for the daily review dashboard
  * Pixel: 1356026399874586 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
+ * Dashboard key: wrangler secret DASHBOARD_KEY (gate returns 503 until set)
  */
 const PIXEL_ID = "1356026399874586";
 const GRAPH_VERSION = "v21.0";
 const ALLOWED_HOST_SUFFIX = "gratus1.io";
 
+// Private paths — only reachable with the access key / auth cookie
+const PROTECTED = ["/gratus1-dashboard.html", "/feed.json"];
+const DASH_COOKIE = "g1_dash";
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
     if (url.pathname === "/capi" && request.method === "POST") {
       return handleCapi(request, env);
     }
+
+    // Private dashboard gate: returns a Response to block/redirect, or null to allow
+    if (PROTECTED.includes(url.pathname)) {
+      const gate = await guardDashboard(request, env, url);
+      if (gate) return gate;
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
+
+async function sha256Hex(input) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function guardDashboard(request, env, url) {
+  if (!env.DASHBOARD_KEY) {
+    return new Response("Dashboard access key not configured.", { status: 503 });
+  }
+  const token = await sha256Hex(env.DASHBOARD_KEY);
+  const cookies = parseCookies(request.headers.get("cookie") || "");
+
+  // Already authenticated via cookie
+  if (cookies[DASH_COOKIE] === token) return null;
+
+  // Magic-link login: visit /gratus1-dashboard.html?key=YOUR_SECRET once
+  if (url.searchParams.get("key") === env.DASHBOARD_KEY) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        location: url.pathname, // strip ?key from the address bar
+        "set-cookie": `${DASH_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`,
+      },
+    });
+  }
+
+  return new Response("401 — Private. Access denied.", {
+    status: 401,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
+}
 
 function parseCookies(header) {
   const out = {};
