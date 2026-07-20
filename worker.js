@@ -2,6 +2,7 @@
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
  *   + private gate for the daily review dashboard
  *   + clean-URL routes for the .dc.html pages
+ *   + Nebula redesign is the canonical homepage (served at /)
  * Pixel: 1356026399874586 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
  * Dashboard key: wrangler secret DASHBOARD_KEY (gate returns 503 until set)
@@ -14,12 +15,20 @@ const ALLOWED_HOST_SUFFIX = "gratus1.io";
 const PROTECTED = ["/gratus1-dashboard.html", "/feed.json"];
 const DASH_COOKIE = "g1_dash";
 
-// Clean URLs → asset files (new .dc.html pages)
+// Clean URLs → asset files (Nebula redesign pages)
 const PAGE_ROUTES = {
+  "/": "/Gratus1 Nebula.dc.html",          // Nebula IS the homepage
   "/home": "/Gratus1 Home.dc.html",
   "/nebula": "/Gratus1 Nebula.dc.html",
   "/my-tech-buddy": "/My Tech Buddy.dc.html",
   "/tactical-vibes": "/Tactical Vibes.dc.html",
+};
+
+// Legacy pages → their new canonical URLs (301 so search engines transfer rank)
+const LEGACY_REDIRECTS = {
+  "/index.html": "/",
+  "/mytechbuddy.html": "/my-tech-buddy",
+  "/tacticalvibes.html": "/tactical-vibes",
 };
 
 export default {
@@ -36,10 +45,17 @@ export default {
       if (gate) return gate;
     }
 
-    // Clean-URL rewrites for the new pages (accept optional trailing slash)
+    // Normalize optional trailing slash (but keep "/" itself)
     const cleanPath = url.pathname.length > 1 && url.pathname.endsWith("/")
       ? url.pathname.slice(0, -1)
       : url.pathname;
+
+    // Legacy page redirects → new canonical URLs
+    if (LEGACY_REDIRECTS[cleanPath]) {
+      return Response.redirect(new URL(LEGACY_REDIRECTS[cleanPath] + url.search, url.origin), 301);
+    }
+
+    // Clean-URL rewrites for the Nebula pages
     if (PAGE_ROUTES[cleanPath]) {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = PAGE_ROUTES[cleanPath];
@@ -49,9 +65,13 @@ export default {
     // Redirect direct hits on the raw .dc.html filenames to their clean URLs
     const decodedPath = decodeURIComponent(url.pathname);
     for (const [clean, asset] of Object.entries(PAGE_ROUTES)) {
-      if (decodedPath === asset) {
+      if (clean !== "/" && decodedPath === asset) {
         return Response.redirect(new URL(clean + url.search, url.origin), 301);
       }
+    }
+    // Raw Nebula filename → root
+    if (decodedPath === "/Gratus1 Nebula.dc.html") {
+      return Response.redirect(new URL("/" + url.search, url.origin), 301);
     }
 
     return env.ASSETS.fetch(request);
