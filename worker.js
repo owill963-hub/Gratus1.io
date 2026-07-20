@@ -1,6 +1,7 @@
 /**
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
  *   + private gate for the daily review dashboard
+ *   + clean-URL routes for the .dc.html pages
  * Pixel: 1356026399874586 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
  * Dashboard key: wrangler secret DASHBOARD_KEY (gate returns 503 until set)
@@ -12,6 +13,14 @@ const ALLOWED_HOST_SUFFIX = "gratus1.io";
 // Private paths — only reachable with the access key / auth cookie
 const PROTECTED = ["/gratus1-dashboard.html", "/feed.json"];
 const DASH_COOKIE = "g1_dash";
+
+// Clean URLs → asset files (new .dc.html pages)
+const PAGE_ROUTES = {
+  "/home": "/Gratus1 Home.dc.html",
+  "/nebula": "/Gratus1 Nebula.dc.html",
+  "/my-tech-buddy": "/My Tech Buddy.dc.html",
+  "/tactical-vibes": "/Tactical Vibes.dc.html",
+};
 
 export default {
   async fetch(request, env, ctx) {
@@ -25,6 +34,24 @@ export default {
     if (PROTECTED.includes(url.pathname)) {
       const gate = await guardDashboard(request, env, url);
       if (gate) return gate;
+    }
+
+    // Clean-URL rewrites for the new pages (accept optional trailing slash)
+    const cleanPath = url.pathname.length > 1 && url.pathname.endsWith("/")
+      ? url.pathname.slice(0, -1)
+      : url.pathname;
+    if (PAGE_ROUTES[cleanPath]) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = PAGE_ROUTES[cleanPath];
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
+
+    // Redirect direct hits on the raw .dc.html filenames to their clean URLs
+    const decodedPath = decodeURIComponent(url.pathname);
+    for (const [clean, asset] of Object.entries(PAGE_ROUTES)) {
+      if (decodedPath === asset) {
+        return Response.redirect(new URL(clean + url.search, url.origin), 301);
+      }
     }
 
     return env.ASSETS.fetch(request);
