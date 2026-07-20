@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-07-20T07:15:00-07:00",
+  "owner": "Oliver",
+  "greeting": "",
+  "intention": "Move one big thing forward before noon.",
+  "kpis": [
+    { "label": "Revenue today", "value": "$4,280", "delta": "\u25b2 12% vs avg", "deltaColor": "#6fcf7a" },
+    { "label": "Orders", "value": "37", "delta": "\u25b2 6 today", "deltaColor": "#6fcf7a" },
+    { "label": "Sessions", "value": "1,942", "delta": "\u25b2 8% traffic", "deltaColor": "#6fcf7a" },
+    { "label": "Conversion", "value": "2.4%", "delta": "\u25bc 0.2 pts", "deltaColor": "#e0b968" },
+    { "label": "Avg. order", "value": "$115.7", "delta": "\u25b2 $4.10", "deltaColor": "#6fcf7a" }
+  ],
+  "sections": [
+    { "key": "news", "title": "News Digest", "source": "Google", "dot": "#6ea8ff", "span": 3, "items": [
+      { "title": "Fed signals rate hold through Q3; markets steady", "meta": "Reuters \u00b7 2h ago", "pill": "#6ea8ff" },
+      { "title": "Wearable-wellness market up 34% YoY", "meta": "TechCrunch \u00b7 4h ago", "pill": "#6ea8ff" },
+      { "title": "New FTC guidance on influencer disclosures", "meta": "The Verge \u00b7 6h ago", "pill": "#e0b968" }
+    ]},
+    { "key": "todo", "title": "Tasks & To-dos", "source": "Google \u00b7 GitHub", "dot": "#c7820e", "span": 3, "items": [
+      { "title": "Finalize Vibrational Sync Q3 product drop", "meta": "Due today \u00b7 High", "pill": "#e05b5b" },
+      { "title": "Review Gratus1.io landing copy", "meta": "Due today", "pill": "#c7820e" },
+      { "title": "Approve Tactical Vibes ad budget", "meta": "Due tomorrow", "pill": "#916306" }
+    ]},
+    { "key": "email", "title": "Inbox", "source": "Google", "dot": "#9c7bff", "span": 2, "items": [
+      { "title": "Re: Wholesale order \u2014 Sedona Wellness", "meta": "Priya M. \u00b7 38m ago", "pill": "#9c7bff" },
+      { "title": "Partnership inquiry \u2014 MindfulTech", "meta": "Unread \u00b7 1h ago", "pill": "#e0b968" },
+      { "title": "Invoice #2287 is overdue", "meta": "Billing \u00b7 3h ago", "pill": "#e05b5b" }
+    ]},
+    { "key": "ticket", "title": "Support Tickets", "source": "GitHub \u00b7 Cloudflare", "dot": "#e05b5b", "span": 2, "items": [
+      { "title": "Checkout error on mobile", "meta": "Shopify \u00b7 #412 \u00b7 High", "pill": "#e05b5b" },
+      { "title": "DNS propagation delay on gratus1.io", "meta": "Cloudflare \u00b7 #409 \u00b7 Medium", "pill": "#e0b968" },
+      { "title": "Login loop \u2014 My Tech Buddy app", "meta": "GitHub \u00b7 #77 \u00b7 High", "pill": "#e05b5b" }
+    ]},
+    { "key": "social", "title": "Social Content Queue", "source": "Scheduled", "dot": "#6fcf7a", "span": 2, "items": [
+      { "title": "IG Reel \u2014 528Hz morning routine", "meta": "Scheduled 9:00 AM", "pill": "#6fcf7a" },
+      { "title": "TikTok \u2014 Tactical Vibes unboxing", "meta": "Scheduled 12:30 PM", "pill": "#6fcf7a" },
+      { "title": "X thread \u2014 the science of gratitude", "meta": "Draft \u00b7 needs approval", "pill": "#e0b968" }
+    ]}
+  ]
+}
