@@ -16,3 +16,6 @@ Gratus1 Home.html
 Gratus1 Nebula.html
 My Tech Buddy.html
 Tactical Vibes.html
+
+# Wrangler build output (never publish sourcemaps)
+.wrangler
