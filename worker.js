@@ -65,12 +65,14 @@ export default {
     // Redirect direct hits on the raw .dc.html filenames to their clean URLs
     const decodedPath = decodeURIComponent(url.pathname);
     for (const [clean, asset] of Object.entries(PAGE_ROUTES)) {
-      if (clean !== "/" && decodedPath === asset) {
+      // Match both the raw filename and its extension-stripped ".dc" form
+      // (older html_handling deployments redirected to the ".dc" path)
+      if (clean !== "/" && (decodedPath === asset || decodedPath === asset.replace(/\.html$/, ""))) {
         return Response.redirect(new URL(clean + url.search, url.origin), 301);
       }
     }
     // Raw Nebula filename → root
-    if (decodedPath === "/Gratus1 Nebula.dc.html") {
+    if (decodedPath === "/Gratus1 Nebula.dc.html" || decodedPath === "/Gratus1 Nebula.dc") {
       return Response.redirect(new URL("/" + url.search, url.origin), 301);
     }
 
