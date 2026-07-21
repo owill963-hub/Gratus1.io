@@ -19,7 +19,6 @@ const DASH_COOKIE = "g1_dash";
 const PAGE_ROUTES = {
   "/": "/Gratus1 Nebula.dc.html",          // Nebula IS the homepage
   "/home": "/Gratus1 Home.dc.html",
-  "/nebula": "/Gratus1 Nebula.dc.html",
   "/my-tech-buddy": "/My Tech Buddy.dc.html",
   "/tactical-vibes": "/Tactical Vibes.dc.html",
 };
@@ -27,6 +26,7 @@ const PAGE_ROUTES = {
 // Legacy pages → their new canonical URLs (301 so search engines transfer rank)
 const LEGACY_REDIRECTS = {
   "/index.html": "/",
+  "/nebula": "/",                           // Nebula lives at / — collapse the alias
   "/mytechbuddy.html": "/my-tech-buddy",
   "/tacticalvibes.html": "/tactical-vibes",
 };
