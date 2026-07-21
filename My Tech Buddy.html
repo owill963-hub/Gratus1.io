@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: #0A0814; }
+  ::selection { background: #8BAA4E; color: #0A0814; }
+  a { color: #A4C46A; text-decoration: none; }
+  a:hover { color: #C2DC8E; }
+  @keyframes mtbspin { to { transform: rotate(360deg); } }
+  @keyframes mtbpulse { 0%,100% { opacity: .5; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
+  @keyframes mtbblink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  @keyframes mtbfloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  @keyframes mtbdrift { 0% { transform: translate(0,0); } 50% { transform: translate(-3%,2%); } 100% { transform: translate(0,0); } }
+</style>
+</helmet>
+<div id="mtb" style="--blue:#8BAA4E;--blueSolid:#6952A7;--purple:#6952A7;--green:#8BAA4E;--white:#FDFCFC;--muted:#8F89A6;--line:rgba(139,170,78,0.26);position:relative;min-height:100vh;background:radial-gradient(ellipse 120% 80% at 70% -10%,#1B1636 0%,#120E24 42%,#0A0814 100%);color:#FDFCFC;font-family:'Space Grotesk',system-ui,sans-serif;overflow-x:hidden;">
+
+  <!-- BACKGROUND -->
+  <div data-parallax="0.05" style="position:fixed;top:-10%;right:-8%;width:66vmax;height:66vmax;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(139,170,78,0.20),rgba(105,82,167,0.06) 36%,transparent 62%);filter:blur(26px);animation:mtbdrift 30s ease-in-out infinite;"></div>
+  <div data-parallax="0.07" style="position:fixed;bottom:-22%;left:-6%;width:60vmax;height:60vmax;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(105,82,167,0.18),transparent 60%);filter:blur(34px);animation:mtbdrift 40s ease-in-out infinite reverse;"></div>
+  <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(139,170,78,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(139,170,78,0.05) 1px,transparent 1px);background-size:70px 70px;-webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 30%,#000,transparent 78%);mask-image:radial-gradient(ellipse 90% 80% at 50% 30%,#000,transparent 78%);"></div>
+
+  <!-- NAV -->
+  <nav style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px clamp(24px,5vw,72px);backdrop-filter:blur(16px);background:rgba(12,9,24,0.55);border-bottom:1px solid var(--line);">
+    <a href="Gratus1 Nebula.dc.html" style="display:flex;align-items:center;gap:12px;color:var(--white);">
+      <span style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--muted);"><span style="font-size:15px;">←</span></span>
+      <span style="font-weight:700;font-size:16px;letter-spacing:.3em;">GRATUS<span style="color:var(--blue);">1</span></span>
+      <span style="width:1px;height:18px;background:var(--line);"></span>
+      <span style="font-weight:600;font-size:15px;letter-spacing:.02em;">My Tech Buddy</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:clamp(16px,3vw,36px);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;">
+      <a href="#features" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">Features</a>
+      <a href="#how" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">How it works</a>
+      <a href="#support" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">Support</a>
+      <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;color:var(--white);background:var(--blueSolid);border:1px solid var(--blue);border-radius:100px;font-weight:600;transition:all .3s;" style-hover="box-shadow:0 0 28px rgba(139,170,78,.55);transform:translateY(-1px);">Download</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header style="position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:center;gap:48px;padding:clamp(48px,8vh,96px) clamp(24px,6vw,80px) clamp(60px,9vh,110px);">
+    <div style="max-width:60ch;">
+      <div data-reveal style="display:inline-flex;align-items:center;gap:12px;padding:9px 18px;border:1px solid var(--line);border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.26em;color:var(--blue);text-transform:uppercase;background:rgba(18,13,34,0.5);">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 10px var(--blue);animation:mtbblink 1.8s infinite;"></span>iOS · AI Assistant
+      </div>
+      <h1 data-reveal data-delay="0.08" style="margin-top:26px;font-weight:700;font-size:clamp(44px,7vw,92px);line-height:0.98;letter-spacing:-0.035em;">My Tech <span style="background:linear-gradient(120deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;">Buddy</span></h1>
+      <p data-reveal data-delay="0.16" style="margin-top:24px;font-size:clamp(16px,1.6vw,20px);line-height:1.6;color:var(--muted);text-wrap:pretty;max-width:52ch;">Your AI-powered personal tech assistant — making technology approachable and intuitive for everyday users.</p>
+      <div data-reveal data-delay="0.24" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:36px;">
+        <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:var(--blueSolid);color:var(--white);font-weight:600;font-size:15px;border:1px solid var(--blue);border-radius:100px;transition:all .3s;" style-hover="box-shadow:0 0 36px rgba(139,170,78,.5);transform:translateY(-2px);">Download on the App Store <span style="font-family:'JetBrains Mono',monospace;">→</span></a>
+        <a href="Gratus1 Nebula.dc.html" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;color:var(--white);font-weight:600;font-size:15px;border:1px solid var(--line);border-radius:100px;background:rgba(18,13,34,0.4);transition:all .3s;" style-hover="border-color:var(--blue);color:var(--blue);">← Back to Gratus1</a>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;">
+      <div data-parallax="0.03" style="position:relative;">
+        <div style="position:absolute;inset:-16% -22%;z-index:-1;border-radius:50%;background:radial-gradient(circle,rgba(139,170,78,0.28),transparent 65%);filter:blur(14px);animation:mtbpulse 6s ease-in-out infinite;"></div>
+        <div data-reveal data-delay="0.2" style="position:relative;width:min(320px,80vw);aspect-ratio:320/650;border-radius:46px;border:1px solid var(--line);background:#171233;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 6px rgba(18,13,34,0.9);padding:13px;animation:mtbfloat 7s ease-in-out infinite;">
+          <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);width:118px;height:26px;border-radius:100px;background:#0A0814;z-index:2;"></div>
+          <div style="position:relative;height:100%;border-radius:34px;overflow:hidden;background:linear-gradient(180deg,#191436,#100C24);">
+            <image-slot id="mtb-screen" shape="rect" placeholder="Drop app screenshot"></image-slot>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- FEATURES -->
+  <section id="features" style="position:relative;z-index:10;padding:clamp(70px,9vh,130px) clamp(24px,6vw,80px);border-top:1px solid var(--line);">
+    <div data-reveal style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;color:var(--blue);text-transform:uppercase;"><span style="width:26px;height:1px;background:var(--blue);"></span>// What it does</div>
+    <h2 data-reveal data-delay="0.05" style="margin-top:20px;font-weight:700;font-size:clamp(32px,5vw,60px);line-height:1.02;letter-spacing:-0.03em;max-width:18ch;">Tech help that <span style="color:var(--blue);">actually makes sense.</span></h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:48px;">
+      <div data-reveal style="padding:30px;background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(139,170,78,0.16);border:1px solid var(--line);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;color:var(--blue);font-weight:600;">01</div>
+        <h3 style="margin-top:22px;font-weight:600;font-size:20px;">Plain-language answers</h3>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Ask any tech question and get clear, jargon-free guidance you can actually follow.</p>
+      </div>
+      <div data-reveal data-delay="0.08" style="padding:30px;background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(105,82,167,0.18);border:1px solid var(--line);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;color:var(--purple);font-weight:600;">02</div>
+        <h3 style="margin-top:22px;font-weight:600;font-size:20px;">Step-by-step help</h3>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Walkthroughs for setup, troubleshooting, and everyday device tasks — one step at a time.</p>
+      </div>
+      <div data-reveal data-delay="0.16" style="padding:30px;background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(139,170,78,0.16);border:1px solid var(--line);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;color:var(--green);font-weight:600;">03</div>
+        <h3 style="margin-top:22px;font-weight:600;font-size:20px;">Always on hand</h3>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Your assistant lives in your pocket, ready whenever technology gets tricky.</p>
+      </div>
+      <div data-reveal data-delay="0.24" style="padding:30px;background:rgba(255,255,255,0.035);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(139,170,78,0.16);border:1px solid var(--line);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;color:var(--blue);font-weight:600;">04</div>
+        <h3 style="margin-top:22px;font-weight:600;font-size:20px;">Built for everyone</h3>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Designed to make technology approachable for users of every skill level.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" style="position:relative;z-index:10;padding:clamp(70px,9vh,130px) clamp(24px,6vw,80px);border-top:1px solid var(--line);">
+    <div data-reveal style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;color:var(--blue);text-transform:uppercase;"><span style="width:26px;height:1px;background:var(--blue);"></span>// How it works</div>
+    <h2 data-reveal data-delay="0.05" style="margin-top:20px;font-weight:700;font-size:clamp(32px,5vw,60px);line-height:1.02;letter-spacing:-0.03em;">Three steps. <span style="color:var(--blue);">Zero stress.</span></h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:48px;">
+      <div data-reveal style="position:relative;padding:34px 30px;background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:16px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:40px;color:var(--blue);line-height:1;">01</div>
+        <h4 style="margin-top:18px;font-weight:600;font-size:19px;">Ask</h4>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Type or speak your tech question in your own words.</p>
+      </div>
+      <div data-reveal data-delay="0.1" style="position:relative;padding:34px 30px;background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:16px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:40px;color:var(--purple);line-height:1;">02</div>
+        <h4 style="margin-top:18px;font-weight:600;font-size:19px;">Understand</h4>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Get a clear, friendly explanation with no jargon.</p>
+      </div>
+      <div data-reveal data-delay="0.2" style="position:relative;padding:34px 30px;background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:16px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:40px;color:var(--green);line-height:1;">03</div>
+        <h4 style="margin-top:18px;font-weight:600;font-size:19px;">Do</h4>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Follow simple steps and solve it with confidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section id="support" style="position:relative;z-index:10;padding:clamp(70px,9vh,130px) clamp(24px,6vw,80px);border-top:1px solid var(--line);">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:center;">
+      <div data-reveal>
+        <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;color:var(--blue);text-transform:uppercase;"><span style="width:26px;height:1px;background:var(--blue);"></span>// Support</div>
+        <h2 style="margin-top:20px;font-weight:700;font-size:clamp(30px,4.5vw,52px);line-height:1.03;letter-spacing:-0.03em;">We've got <span style="color:var(--blue);">your six.</span></h2>
+        <p style="margin-top:18px;font-size:16px;line-height:1.65;color:var(--muted);max-width:48ch;">Questions, issues, or feature requests for My Tech Buddy on iOS? Reach out — we respond promptly.</p>
+      </div>
+      <div data-reveal data-delay="0.1" style="position:relative;padding:34px;background:rgba(255,255,255,0.04);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--blue);">iOS Support</div>
+        <h4 style="margin-top:14px;font-weight:700;font-size:22px;">Reach the team</h4>
+        <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Support for installation, account questions, troubleshooting, and feature requests.</p>
+        <a href="mailto:support@gratus1.io?subject=My%20Tech%20Buddy%20Support" style="display:inline-block;margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--blue);">support@gratus1.io →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="position:relative;z-index:10;padding:clamp(80px,11vh,150px) clamp(24px,6vw,80px);border-top:1px solid var(--line);text-align:center;overflow:hidden;">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(560px,90vw);aspect-ratio:1;z-index:-1;pointer-events:none;opacity:.7;">
+      <div style="position:absolute;inset:0;border:1px dashed rgba(139,170,78,0.18);border-radius:50%;animation:mtbspin 48s linear infinite;"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:26%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--blue),var(--blueSolid) 55%,transparent 78%);filter:blur(2px);animation:mtbpulse 6s ease-in-out infinite;"></div>
+    </div>
+    <h2 data-reveal style="font-weight:700;font-size:clamp(34px,5.5vw,72px);line-height:1.0;letter-spacing:-0.03em;max-width:16ch;margin:0 auto;">Meet your <span style="color:var(--blue);">tech buddy.</span></h2>
+    <p data-reveal data-delay="0.08" style="margin:22px auto 0;max-width:52ch;font-size:17px;line-height:1.6;color:var(--muted);">Download on iOS and make technology feel simple again.</p>
+    <div data-reveal data-delay="0.14" style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:36px;">
+      <a href="https://apps.apple.com/us/app/my-tech-buddy/id6771501862" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:17px 32px;background:var(--blueSolid);color:var(--white);font-weight:600;font-size:15px;border:1px solid var(--blue);border-radius:100px;transition:all .3s;" style-hover="box-shadow:0 0 40px rgba(139,170,78,.5);transform:translateY(-2px);">Download on the App Store →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="position:relative;z-index:10;padding:clamp(48px,6vh,80px) clamp(24px,6vw,80px) 56px;border-top:1px solid var(--line);background:rgba(7,9,20,0.6);backdrop-filter:blur(10px);">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px;align-items:center;">
+      <a href="Gratus1 Nebula.dc.html" style="font-weight:700;font-size:16px;letter-spacing:.3em;color:var(--white);">GRATUS<span style="color:var(--blue);">1</span></a>
+      <div style="display:flex;flex-wrap:wrap;gap:24px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;">
+        <a href="Gratus1 Nebula.dc.html" style="color:var(--muted);" style-hover="color:var(--blue);">Home</a>
+        <a href="Tactical Vibes.dc.html" style="color:var(--muted);" style-hover="color:var(--blue);">Tactical Vibes</a>
+        <a href="https://owilliamsconsulting.com" style="color:var(--muted);" style-hover="color:var(--blue);">Consulting</a>
+        <a href="mailto:support@gratus1.io" style="color:var(--muted);" style-hover="color:var(--blue);">Support</a>
+      </div>
+    </div>
+    <div style="margin-top:32px;padding-top:22px;border-top:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--muted);">© 2026 Gratus1.io · My Tech Buddy · Veteran-owned</div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motionLevel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;rich&quot;,&quot;subtle&quot;,&quot;off&quot;],&quot;default&quot;:&quot;rich&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    const root = document.getElementById('mtb');
+    if (!root) return;
+    const motion = this.props.motionLevel ?? 'rich';
+    const reduce = motion === 'off';
+
+    const items = [...root.querySelectorAll('[data-reveal]')];
+    if (reduce) {
+      items.forEach(el => { el.style.opacity = 1; });
+    } else {
+      items.forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(28px)';
+        el.style.transition = 'opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1)';
+        el.style.willChange = 'opacity, transform';
+      });
+      const io = new IntersectionObserver((ents) => {
+        ents.forEach(e => {
+          if (e.isIntersecting) {
+            const d = parseFloat(e.target.dataset.delay || 0);
+            setTimeout(() => { e.target.style.opacity = 1; e.target.style.transform = 'none'; }, d * 1000);
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      items.forEach(el => io.observe(el));
+    }
+
+    if (!reduce && motion === 'rich') {
+      const mLayers = [...root.querySelectorAll('[data-parallax]')];
+      mLayers.forEach(el => { el.dataset.base = el.style.transform || ''; });
+      let mx = 0, my = 0, cx = 0, cy = 0;
+      this._mv = (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; };
+      window.addEventListener('mousemove', this._mv);
+      const loop = () => {
+        cx += (mx - cx) * 0.06; cy += (my - cy) * 0.06;
+        mLayers.forEach(el => {
+          const s = parseFloat(el.dataset.parallax);
+          el.style.transform = `${el.dataset.base} translate3d(${(-cx * s * 120).toFixed(2)}px, ${(-cy * s * 120).toFixed(2)}px, 0)`;
+        });
+        this._raf = requestAnimationFrame(loop);
+      };
+      loop();
+    }
+  }
+  componentWillUnmount() {
+    cancelAnimationFrame(this._raf);
+    if (this._mv) window.removeEventListener('mousemove', this._mv);
+  }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
