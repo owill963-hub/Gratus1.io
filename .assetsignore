@@ -7,3 +7,12 @@ README.md
 node_modules
 worker.js
 CLAUDE.md
+CLAUDE_SUPERVISOR.md
+
+# Raw design-tool exports — superseded by the *.dc.html production files.
+# These lack canonical/OG meta and use relative links, so publishing them
+# creates duplicate content and broken navigation.
+Gratus1 Home.html
+Gratus1 Nebula.html
+My Tech Buddy.html
+Tactical Vibes.html
