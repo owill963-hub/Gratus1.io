@@ -12,7 +12,13 @@ const GRAPH_VERSION = "v21.0";
 const ALLOWED_HOST_SUFFIX = "gratus1.io";
 
 // Clean-URL → asset filename
-const PAGE_ROUTES = { "/status-board": "/Daily Dashboard.html" };
+const PAGE_ROUTES = {
+  "/": "/Gratus1 Nebula.dc.html",
+  "/home": "/Gratus1 Home.dc.html",
+  "/my-tech-buddy": "/My Tech Buddy.dc.html",
+  "/tactical-vibes": "/Tactical Vibes.dc.html",
+  "/status-board": "/Daily Dashboard.html",
+};
 
 // Private paths — only reachable with the access key / auth cookie.
 // Gate both the clean route AND the raw filename so the file can't be
