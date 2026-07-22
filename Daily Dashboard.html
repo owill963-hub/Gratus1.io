@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Figtree:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #0A0A0A; }
+  a { color: #c7820e; text-decoration: none; }
+  a:hover { color: #e0a13a; }
+  input, button { font-family: inherit; }
+  ::selection { background: rgba(199,130,14,.32); }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes glow { 0%,100% { opacity:.5; } 50% { opacity:.9; } }
+  .om-scroll::-webkit-scrollbar { width: 6px; }
+  .om-scroll::-webkit-scrollbar-thumb { background: rgba(199,130,14,.3); border-radius: 8px; }
+</style>
+</helmet>
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <rect width="512" height="512" fill="#0A0A0A"/>
+    <rect x="150" y="150" width="212" height="212" rx="44" fill="url(#g1grad)"/>
+    <text x="256" y="300" font-family="Georgia,serif" font-size="120" font-weight="600" fill="#0A0A0A" text-anchor="middle">G1</text>
+    <defs><linearGradient id="g1grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ad3e"/><stop offset="0.5" stop-color="#c7820e"/><stop offset="1" stop-color="#916306"/></linearGradient></defs>
+  </svg>
+</template>
+<div style="min-height:100vh; font-family:'Figtree',system-ui,sans-serif; color:#f4efe6; background:radial-gradient(1200px 700px at 78% -8%, rgba(199,130,14,.14), transparent 60%), radial-gradient(900px 600px at 10% 110%, rgba(67,44,17,.5), transparent 55%), #0A0A0A; padding:40px 44px 72px;">
+  <div style="max-width:1440px; margin:0 auto;">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:36px;">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Newsreader',serif; font-weight:500; font-size:22px; color:#0A0A0A; background:linear-gradient(150deg,#e6ad3e,#c7820e 42%,#916306); box-shadow:0 8px 20px rgba(199,130,14,.35), inset 0 1px 0 rgba(255,255,255,.4);">G1</div>
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:.26em; font-size:15px; color:#f4efe6;">GRATUS1</div>
+          <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#99773f;">Daily Review Console</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; padding:7px 13px; border-radius:999px; background:rgba(255,255,255,.03); border:1px solid rgba(199,130,14,.22); font-size:12px; font-weight:600; letter-spacing:.04em; color:{{ statusColor }};">
+          <span style="width:7px; height:7px; border-radius:50%; background:{{ statusColor }}; box-shadow:0 0 8px {{ statusColor }};"></span>
+          {{ statusLabel }}
+        </div>
+        <sc-for list="{{ sources }}" as="src" hint-placeholder-count="4">
+          <div style="display:flex; align-items:center; gap:7px; padding:7px 12px; border-radius:999px; background:rgba(255,255,255,.03); border:1px solid rgba(199,130,14,.16); font-size:12px; color:#c9bfae;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#6fcf7a; box-shadow:0 0 8px #6fcf7a; animation:glow 2.6s ease-in-out infinite;"></span>
+            {{ src.name }}
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:32px; margin-bottom:30px;">
+      <div>
+        <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#99773f; margin-bottom:10px;">{{ dateLine }}</div>
+        <h1 style="margin:0; font-family:'Newsreader',serif; font-weight:400; font-size:52px; line-height:1.02; color:#f6f1e8;">{{ greeting }}, <span style="color:#c7820e;">{{ ownerName }}</span>.</h1>
+        <div style="margin-top:16px; display:flex; align-items:center; gap:12px;">
+          <span style="font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#805f3f;">Today's intention</span>
+          <input value="{{ intention }}" onChange="{{ onIntention }}" placeholder="Set an intention for today…" style="flex:1; min-width:340px; background:transparent; border:none; border-bottom:1px solid rgba(199,130,14,.3); color:#e9c982; font-family:'Newsreader',serif; font-style:italic; font-size:19px; padding:4px 2px; outline:none;" />
+        </div>
+      </div>
+      <div style="text-align:right; flex-shrink:0;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:600; color:#f6f1e8; line-height:1;">{{ totalOpen }}</div>
+        <div style="font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#99773f; margin-top:6px;">items to review</div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:30px;">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+        <div data-tilt style="position:relative; padding:20px 20px 18px; border-radius:16px; background:linear-gradient(160deg, rgba(40,30,14,.9), rgba(18,14,8,.92)); border:1px solid rgba(199,130,14,.18); box-shadow:0 18px 34px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.06); transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s; transform-style:preserve-3d;">
+          <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#99773f;">{{ k.label }}</div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:29px; font-weight:600; color:#f6f1e8; margin-top:10px; line-height:1;">{{ k.value }}</div>
+          <div style="font-size:12px; margin-top:8px; color:{{ k.deltaColor }};">{{ k.delta }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:20px; align-items:start;">
+      <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="5">
+        <div data-tilt style="grid-column:span {{ sec.span }}; position:relative; border-radius:20px; background:linear-gradient(165deg, rgba(34,26,13,.92), rgba(16,12,7,.95)); border:1px solid rgba(199,130,14,.16); box-shadow:0 34px 60px -30px rgba(0,0,0,.95), 0 2px 0 rgba(255,255,255,.02), inset 0 1px 0 rgba(255,255,255,.05); transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s; transform-style:preserve-3d;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 22px 16px; border-bottom:1px solid rgba(199,130,14,.1);">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:{{ sec.dot }}; box-shadow:0 0 12px {{ sec.dot }};"></span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px; color:#f4efe6; letter-spacing:.01em;">{{ sec.title }}</span>
+              <span style="font-size:12px; font-weight:600; color:#0A0A0A; background:#c7820e; border-radius:999px; padding:2px 9px;">{{ sec.count }}</span>
+            </div>
+            <span style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#805f3f; padding:4px 9px; border-radius:6px; background:rgba(199,130,14,.08);">{{ sec.source }}</span>
+          </div>
+          <div class="om-scroll" style="padding:8px 12px 14px; max-height:360px; overflow:auto;">
+            <sc-for list="{{ sec.items }}" as="item" hint-placeholder-count="3">
+              <div style="position:relative; display:flex; align-items:flex-start; gap:12px; padding:13px 12px; border-radius:12px;" style-hover="background:rgba(199,130,14,.06);">
+                <span style="margin-top:5px; width:8px; height:8px; border-radius:2px; flex-shrink:0; background:{{ item.pill }}; box-shadow:0 0 8px {{ item.pill }};"></span>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:14.5px; font-weight:500; color:#f0e9dc; line-height:1.35;">{{ item.title }}</div>
+                  <div style="font-size:12px; color:#8a8072; margin-top:4px;">{{ item.meta }}</div>
+                </div>
+                <div style="position:relative; flex-shrink:0;">
+                  <button onClick="{{ item.onToggle }}" style="display:flex; align-items:center; gap:6px; padding:6px 11px; border-radius:9px; border:1px solid rgba(199,130,14,.28); background:rgba(199,130,14,.08); color:#e0b968; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;" style-hover="background:rgba(199,130,14,.16);">
+                    Action
+                    <span style="font-size:9px; opacity:.8;">▾</span>
+                  </button>
+                  <sc-if value="{{ item.isOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute; top:calc(100% + 8px); right:0; z-index:40; min-width:186px; padding:6px; border-radius:13px; background:linear-gradient(165deg,#241a0d,#120d07); border:1px solid rgba(199,130,14,.3); box-shadow:0 26px 46px -14px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.08);">
+                      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#805f3f; padding:6px 10px 8px;">Automated action</div>
+                      <sc-for list="{{ item.actions }}" as="act" hint-placeholder-count="4">
+                        <button onClick="{{ act.onClick }}" style="display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:9px 10px; border-radius:8px; border:none; background:transparent; color:#e7ddca; font-size:13.5px; font-weight:500; cursor:pointer;" style-hover="background:rgba(199,130,14,.16);">
+                          <span style="font-size:14px;">{{ act.icon }}</span>
+                          {{ act.label }}
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:34px; text-align:center; font-size:12px; color:#5f574a; letter-spacing:.08em;">
+      Compiled by your scheduled task · Last sync {{ syncTime }} · Feeds: {{ feedList }}
+    </div>
+  </div>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" style="position:fixed; inset:0; z-index:30;"></div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="">
+    <div style="position:fixed; bottom:28px; right:28px; z-index:60; display:flex; align-items:center; gap:14px; padding:15px 20px; border-radius:14px; background:linear-gradient(160deg,#2a1f0f,#150f08); border:1px solid rgba(199,130,14,.4); box-shadow:0 26px 50px -16px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.08); animation:toastIn .28s cubic-bezier(.2,.8,.2,1);">
+      <span style="width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:linear-gradient(150deg,#e6ad3e,#c7820e); color:#0A0A0A; font-size:16px;">✓</span>
+      <div>
+        <div style="font-size:14px; font-weight:600; color:#f4efe6;">{{ toast }}</div>
+        <div style="font-size:12px; color:#99773f; margin-top:2px;">Queued for automation</div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1180},&quot;ownerName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Oliver&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;greeting&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;enableTilt&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;depth&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:2,&quot;step&quot;:0.25,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = { openId: null, toast: "", intention: "", toastTimer: null, feed: null, feedStatus: "loading" };
+
+  loadFeed() {
+    fetch("./feed.json", { cache: "no-store" })
+      .then((r) => { if (!r.ok) throw new Error("no feed"); return r.json(); })
+      .then((feed) => this.setState((s) => ({
+        feed,
+        feedStatus: "live",
+        intention: s.intention || feed.intention || "",
+      })))
+      .catch(() => this.setState({ feedStatus: "sample" }));
+  }
+
+  componentDidMount() {
+    this.loadFeed();
+    this._poll = setInterval(() => this.loadFeed(), 300000); // refresh every 5 min
+    this._move = (e) => {
+      if (this.props.enableTilt === false) return;
+      document.querySelectorAll('[data-tilt]').forEach((card) => {
+        const r = card.getBoundingClientRect();
+        const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if (inside) {
+          const px = (e.clientX - r.left) / r.width - 0.5;
+          const py = (e.clientY - r.top) / r.height - 0.5;
+          const d = this.props.depth ?? 1;
+          card.style.transform = `perspective(1300px) rotateX(${(-py * 3.4 * d).toFixed(2)}deg) rotateY(${(px * 4.2 * d).toFixed(2)}deg) translateY(-6px)`;
+          card.style.boxShadow = '0 42px 70px -28px rgba(0,0,0,.98), inset 0 1px 0 rgba(255,255,255,.09)';
+        } else if (card.style.transform) {
+          card.style.transform = '';
+          card.style.boxShadow = '';
+        }
+      });
+    };
+    window.addEventListener('pointermove', this._move);
+  }
+  componentWillUnmount() { window.removeEventListener('pointermove', this._move); clearInterval(this._poll); }
+
+  fire(label, subject) {
+    if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
+    const t = setTimeout(() => this.setState({ toast: "" }), 3200);
+    this.setState({ toast: `${label} — “${subject}”`, openId: null, toastTimer: t });
+  }
+
+  // action catalogs by item type
+  actionsFor(type) {
+    const A = {
+      draft:   { label: "Draft a reply",   icon: "✍" },
+      summarize:{ label: "Summarize",      icon: "≡" },
+      snooze:  { label: "Snooze / remind", icon: "◷" },
+      approve: { label: "Approve & post",  icon: "▶" },
+      task:    { label: "Create task",     icon: "＋" },
+      escalate:{ label: "Escalate",        icon: "⚑" },
+      archive: { label: "Archive / dismiss", icon: "⌫" },
+    };
+    const map = {
+      news:   ["summarize", "task", "snooze", "archive"],
+      todo:   ["snooze", "escalate", "task", "archive"],
+      email:  ["draft", "summarize", "snooze", "task", "archive"],
+      ticket: ["draft", "escalate", "task", "snooze", "archive"],
+      social: ["approve", "draft", "snooze", "archive"],
+    };
+    return (map[type] || ["summarize", "task", "archive"]).map((k) => A[k]);
+  }
+
+  sampleSections() {
+    return [
+      { key: "news", title: "News Digest", source: "Google", dot: "#6ea8ff", span: 3, items: [
+        { title: "Fed signals rate hold through Q3; markets steady", meta: "Reuters · 2h ago", pill: "#6ea8ff" },
+        { title: "Wearable-wellness market up 34% YoY", meta: "TechCrunch · 4h ago", pill: "#6ea8ff" },
+        { title: "New FTC guidance on influencer disclosures", meta: "The Verge · 6h ago", pill: "#e0b968" },
+      ]},
+      { key: "todo", title: "Tasks & To-dos", source: "Google · GitHub", dot: "#c7820e", span: 3, items: [
+        { title: "Finalize Vibrational Sync Q3 product drop", meta: "Due today · High", pill: "#e05b5b" },
+        { title: "Review Gratus1.io landing copy", meta: "Due today", pill: "#c7820e" },
+        { title: "Approve Tactical Vibes ad budget", meta: "Due tomorrow", pill: "#916306" },
+      ]},
+      { key: "email", title: "Inbox", source: "Google", dot: "#9c7bff", span: 2, items: [
+        { title: "Re: Wholesale order — Sedona Wellness", meta: "Priya M. · 38m ago", pill: "#9c7bff" },
+        { title: "Partnership inquiry — MindfulTech", meta: "Unread · 1h ago", pill: "#e0b968" },
+        { title: "Invoice #2287 is overdue", meta: "Billing · 3h ago", pill: "#e05b5b" },
+      ]},
+      { key: "ticket", title: "Support Tickets", source: "GitHub · Cloudflare", dot: "#e05b5b", span: 2, items: [
+        { title: "Checkout error on mobile", meta: "Shopify · #412 · High", pill: "#e05b5b" },
+        { title: "DNS propagation delay on gratus1.io", meta: "Cloudflare · #409 · Medium", pill: "#e0b968" },
+        { title: "Login loop — My Tech Buddy app", meta: "GitHub · #77 · High", pill: "#e05b5b" },
+      ]},
+      { key: "social", title: "Social Content Queue", source: "Scheduled", dot: "#6fcf7a", span: 2, items: [
+        { title: "IG Reel — 528Hz morning routine", meta: "Scheduled 9:00 AM", pill: "#6fcf7a" },
+        { title: "TikTok — Tactical Vibes unboxing", meta: "Scheduled 12:30 PM", pill: "#6fcf7a" },
+        { title: "X thread — the science of gratitude", meta: "Draft · needs approval", pill: "#e0b968" },
+      ]},
+    ];
+  }
+
+  sampleKpis() {
+    return [
+      { label: "Revenue today", value: "$4,280", delta: "▲ 12% vs avg", deltaColor: "#6fcf7a" },
+      { label: "Orders", value: "37", delta: "▲ 6 today", deltaColor: "#6fcf7a" },
+      { label: "Sessions", value: "1,942", delta: "▲ 8% traffic", deltaColor: "#6fcf7a" },
+      { label: "Conversion", value: "2.4%", delta: "▼ 0.2 pts", deltaColor: "#e0b968" },
+      { label: "Avg. order", value: "$115.7", delta: "▲ $4.10", deltaColor: "#6fcf7a" },
+    ];
+  }
+
+  renderVals() {
+    const feed = this.state.feed;
+    const raw = (feed && feed.sections) || this.sampleSections();
+    let idx = 0;
+    const sections = raw.map((sec) => ({
+      title: sec.title,
+      source: sec.source,
+      dot: sec.dot,
+      span: sec.span,
+      count: sec.items.length,
+      items: sec.items.map((it) => {
+        const id = `${sec.key}-${idx++}`;
+        return {
+          title: it.title,
+          meta: it.meta,
+          pill: it.pill,
+          isOpen: this.state.openId === id,
+          onToggle: () => this.setState((s) => ({ openId: s.openId === id ? null : id })),
+          actions: this.actionsFor(sec.key).map((a) => ({
+            label: a.label,
+            icon: a.icon,
+            onClick: () => this.fire(a.label, it.title),
+          })),
+        };
+      }),
+    }));
+
+    const totalOpen = raw.reduce((n, s) => n + s.items.length, 0);
+
+    const kpis = (feed && feed.kpis) || this.sampleKpis();
+
+    const now = new Date();
+    const synced = feed && feed.generatedAt ? new Date(feed.generatedAt) : now;
+    const isLive = this.state.feedStatus === "live";
+    const h = now.getHours();
+    const greeting = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+    const dateLine = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+
+    return {
+      sections, kpis, totalOpen,
+      greeting: this.props.greeting || greeting,
+      ownerName: this.props.ownerName || (feed && feed.owner) || "Oliver",
+      dateLine,
+      isLive,
+      statusLabel: isLive ? "Live feed" : this.state.feedStatus === "loading" ? "Connecting…" : "Sample data",
+      statusColor: isLive ? "#6fcf7a" : this.state.feedStatus === "loading" ? "#e0b968" : "#805f3f",
+      intention: this.state.intention,
+      onIntention: (e) => this.setState({ intention: e.target.value }),
+      menuOpen: this.state.openId !== null,
+      closeMenu: () => this.setState({ openId: null }),
+      toast: this.state.toast,
+      sources: [{ name: "GitHub" }, { name: "Cloudflare" }, { name: "Google" }, { name: "Shopify" }],
+      feedList: "GitHub · Cloudflare · Google · Shopify",
+      syncTime: synced.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    };
+  }
+}
+</script>
+</body>
+</html>
