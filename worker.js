@@ -1,16 +1,23 @@
 /**
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
- *   + private gate for the daily review dashboard
+ *   + private gate for the daily dashboard
  * Pixel: 1356026399874586 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
  * Dashboard key: wrangler secret DASHBOARD_KEY (gate returns 503 until set)
+ * Dashboard: clean URL /status-board  →  serves "Daily Dashboard.html"
+ *            first visit /status-board?key=YOUR_SECRET  sets a 1yr cookie
  */
 const PIXEL_ID = "1356026399874586";
 const GRAPH_VERSION = "v21.0";
 const ALLOWED_HOST_SUFFIX = "gratus1.io";
 
-// Private paths — only reachable with the access key / auth cookie
-const PROTECTED = ["/gratus1-dashboard.html", "/feed.json"];
+// Clean-URL → asset filename
+const PAGE_ROUTES = { "/status-board": "/Daily Dashboard.html" };
+
+// Private paths — only reachable with the access key / auth cookie.
+// Gate both the clean route AND the raw filename so the file can't be
+// reached directly, un-gated.
+const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json"];
 const DASH_COOKIE = "g1_dash";
 
 export default {
@@ -25,6 +32,13 @@ export default {
     if (PROTECTED.includes(url.pathname)) {
       const gate = await guardDashboard(request, env, url);
       if (gate) return gate;
+    }
+
+    // Clean-URL rewrite (runs only after the gate has passed)
+    if (PAGE_ROUTES[url.pathname]) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = PAGE_ROUTES[url.pathname];
+      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     return env.ASSETS.fetch(request);
@@ -46,7 +60,7 @@ async function guardDashboard(request, env, url) {
   // Already authenticated via cookie
   if (cookies[DASH_COOKIE] === token) return null;
 
-  // Magic-link login: visit /gratus1-dashboard.html?key=YOUR_SECRET once
+  // Magic-link login: visit /status-board?key=YOUR_SECRET once
   if (url.searchParams.get("key") === env.DASHBOARD_KEY) {
     return new Response(null, {
       status: 302,
