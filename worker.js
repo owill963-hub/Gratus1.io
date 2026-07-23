@@ -26,6 +26,14 @@ const PAGE_ROUTES = {
 const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json"];
 const DASH_COOKIE = "g1_dash";
 
+// Legacy pages → their new canonical URLs (301 so search engines transfer rank)
+const LEGACY_REDIRECTS = {
+  "/index.html": "/",
+  "/nebula": "/", // Nebula lives at / — collapse the alias
+  "/mytechbuddy.html": "/my-tech-buddy",
+  "/tacticalvibes.html": "/tactical-vibes",
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -34,17 +42,43 @@ export default {
       return handleCapi(request, env);
     }
 
+    // Normalize optional trailing slash (but keep "/" itself)
+    const cleanPath = url.pathname.length > 1 && url.pathname.endsWith("/")
+      ? url.pathname.slice(0, -1)
+      : url.pathname;
+
     // Private dashboard gate: returns a Response to block/redirect, or null to allow
-    if (PROTECTED.includes(url.pathname)) {
+    // (checked against the normalized path so "/status-board/" can't bypass it)
+    if (PROTECTED.includes(cleanPath)) {
       const gate = await guardDashboard(request, env, url);
       if (gate) return gate;
     }
 
+    // Legacy page redirects → new canonical URLs
+    if (LEGACY_REDIRECTS[cleanPath]) {
+      return Response.redirect(new URL(LEGACY_REDIRECTS[cleanPath] + url.search, url.origin), 301);
+    }
+
     // Clean-URL rewrite (runs only after the gate has passed)
-    if (PAGE_ROUTES[url.pathname]) {
+    if (PAGE_ROUTES[cleanPath]) {
       const assetUrl = new URL(request.url);
-      assetUrl.pathname = PAGE_ROUTES[url.pathname];
+      assetUrl.pathname = PAGE_ROUTES[cleanPath];
       return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
+
+    // Redirect direct hits on the raw .dc.html filenames to their clean URLs
+    // (skip protected assets — the gate above already handles those paths)
+    const decodedPath = decodeURIComponent(url.pathname);
+    for (const [clean, asset] of Object.entries(PAGE_ROUTES)) {
+      if (clean === "/" || clean === "/status-board") continue;
+      // Match both the raw filename and its extension-stripped ".dc" form
+      if (decodedPath === asset || decodedPath === asset.replace(/\.html$/, "")) {
+        return Response.redirect(new URL(clean + url.search, url.origin), 301);
+      }
+    }
+    // Raw Nebula filename → root
+    if (decodedPath === "/Gratus1 Nebula.dc.html" || decodedPath === "/Gratus1 Nebula.dc") {
+      return Response.redirect(new URL("/" + url.search, url.origin), 301);
     }
 
     return env.ASSETS.fetch(request);
