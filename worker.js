@@ -30,6 +30,7 @@ const DASH_COOKIE = "g1_dash";
 const LEGACY_REDIRECTS = {
   "/index.html": "/",
   "/nebula": "/", // Nebula lives at / — collapse the alias
+  "/Gratus1.html": "/", // headless pre-launch fragment — no <head>/canonical
   "/mytechbuddy.html": "/my-tech-buddy",
   "/tacticalvibes.html": "/tactical-vibes",
 };
