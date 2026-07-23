@@ -21,8 +21,42 @@
   ::selection { background: rgba(199,130,14,.32); }
   @keyframes toastIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes glow { 0%,100% { opacity:.5; } 50% { opacity:.9; } }
-  .om-scroll::-webkit-scrollbar { width: 6px; }
-  .om-scroll::-webkit-scrollbar-thumb { background: rgba(199,130,14,.3); border-radius: 8px; }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Scrollbar — deliberately visible so it reads as scrollable content */
+  .om-scroll::-webkit-scrollbar { width: 9px; }
+  .om-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.035); border-radius: 8px; margin: 4px 0; }
+  .om-scroll::-webkit-scrollbar-thumb { background: rgba(199,130,14,.42); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+  .om-scroll::-webkit-scrollbar-thumb:hover { background: rgba(199,130,14,.7); background-clip: padding-box; }
+  .om-scroll { scrollbar-width: thin; scrollbar-color: rgba(199,130,14,.42) rgba(255,255,255,.035); }
+
+  /* Section body: taller viewport-aware scroll area, never clips children */
+  .g1-scroll {
+    max-height: min(58vh, 460px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+  }
+
+  .g1-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 30px; }
+  .g1-sections { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; align-items: start; }
+
+  @media (max-width: 1180px) {
+    .g1-kpis { grid-template-columns: repeat(3, 1fr); }
+    .g1-sections { grid-template-columns: repeat(4, 1fr); }
+    .g1-card { grid-column: span 2 !important; }
+  }
+  @media (max-width: 820px) {
+    .g1-kpis { grid-template-columns: repeat(2, 1fr); }
+    .g1-sections { grid-template-columns: 1fr; }
+    .g1-card { grid-column: 1 / -1 !important; }
+    /* On small screens let the page scroll instead of nesting scroll areas */
+    .g1-scroll { max-height: none; }
+    .g1-hero-input { min-width: 0 !important; width: 100%; }
+    .g1-hero { flex-wrap: wrap; }
+    .g1-count { text-align: left !important; }
+  }
 </style>
 </helmet>
 <template id="__bundler_thumbnail">
@@ -33,10 +67,10 @@
     <defs><linearGradient id="g1grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ad3e"/><stop offset="0.5" stop-color="#c7820e"/><stop offset="1" stop-color="#916306"/></linearGradient></defs>
   </svg>
 </template>
-<div style="min-height:100vh; font-family:'Figtree',system-ui,sans-serif; color:#f4efe6; background:radial-gradient(1200px 700px at 78% -8%, rgba(199,130,14,.14), transparent 60%), radial-gradient(900px 600px at 10% 110%, rgba(67,44,17,.5), transparent 55%), #0A0A0A; padding:40px 44px 72px;">
+<div style="min-height:100vh; font-family:'Figtree',system-ui,sans-serif; color:#f4efe6; background:radial-gradient(1200px 700px at 78% -8%, rgba(199,130,14,.14), transparent 60%), radial-gradient(900px 600px at 10% 110%, rgba(67,44,17,.5), transparent 55%), #0A0A0A; padding:clamp(20px,4vw,40px) clamp(16px,3.5vw,44px) 72px;">
   <div style="max-width:1440px; margin:0 auto;">
 
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; margin-bottom:36px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:36px;">
       <div style="display:flex; align-items:center; gap:16px;">
         <div style="width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'Newsreader',serif; font-weight:500; font-size:22px; color:#0A0A0A; background:linear-gradient(150deg,#e6ad3e,#c7820e 42%,#916306); box-shadow:0 8px 20px rgba(199,130,14,.35), inset 0 1px 0 rgba(255,255,255,.4);">G1</div>
         <div>
@@ -44,7 +78,7 @@
           <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#99773f;">Daily Review Console</div>
         </div>
       </div>
-      <div style="display:flex; align-items:center; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <div style="display:flex; align-items:center; gap:8px; padding:7px 13px; border-radius:999px; background:rgba(255,255,255,.03); border:1px solid rgba(199,130,14,.22); font-size:12px; font-weight:600; letter-spacing:.04em; color:{{ statusColor }};">
           <span style="width:7px; height:7px; border-radius:50%; background:{{ statusColor }}; box-shadow:0 0 8px {{ statusColor }};"></span>
           {{ statusLabel }}
@@ -58,22 +92,22 @@
       </div>
     </div>
 
-    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:32px; margin-bottom:30px;">
-      <div>
+    <div class="g1-hero" style="display:flex; align-items:flex-end; justify-content:space-between; gap:32px; margin-bottom:30px;">
+      <div style="flex:1; min-width:0;">
         <div style="font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:#99773f; margin-bottom:10px;">{{ dateLine }}</div>
-        <h1 style="margin:0; font-family:'Newsreader',serif; font-weight:400; font-size:52px; line-height:1.02; color:#f6f1e8;">{{ greeting }}, <span style="color:#c7820e;">{{ ownerName }}</span>.</h1>
-        <div style="margin-top:16px; display:flex; align-items:center; gap:12px;">
+        <h1 style="margin:0; font-family:'Newsreader',serif; font-weight:400; font-size:clamp(30px,4.6vw,52px); line-height:1.04; color:#f6f1e8;">{{ greeting }}, <span style="color:#c7820e;">{{ ownerName }}</span>.</h1>
+        <div style="margin-top:16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <span style="font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#805f3f;">Today's intention</span>
-          <input value="{{ intention }}" onChange="{{ onIntention }}" placeholder="Set an intention for today…" style="flex:1; min-width:340px; background:transparent; border:none; border-bottom:1px solid rgba(199,130,14,.3); color:#e9c982; font-family:'Newsreader',serif; font-style:italic; font-size:19px; padding:4px 2px; outline:none;" />
+          <input class="g1-hero-input" value="{{ intention }}" onChange="{{ onIntention }}" placeholder="Set an intention for today…" style="flex:1; min-width:340px; background:transparent; border:none; border-bottom:1px solid rgba(199,130,14,.3); color:#e9c982; font-family:'Newsreader',serif; font-style:italic; font-size:19px; padding:4px 2px; outline:none;" />
         </div>
       </div>
-      <div style="text-align:right; flex-shrink:0;">
+      <div class="g1-count" style="text-align:right; flex-shrink:0;">
         <div style="font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:600; color:#f6f1e8; line-height:1;">{{ totalOpen }}</div>
         <div style="font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#99773f; margin-top:6px;">items to review</div>
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:30px;">
+    <div class="g1-kpis">
       <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
         <div data-tilt style="position:relative; padding:20px 20px 18px; border-radius:16px; background:linear-gradient(160deg, rgba(40,30,14,.9), rgba(18,14,8,.92)); border:1px solid rgba(199,130,14,.18); box-shadow:0 18px 34px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.06); transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s; transform-style:preserve-3d;">
           <div style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#99773f;">{{ k.label }}</div>
@@ -83,45 +117,60 @@
       </sc-for>
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:20px; align-items:start;">
+    <div class="g1-sections">
       <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="5">
-        <div data-tilt style="grid-column:span {{ sec.span }}; position:relative; border-radius:20px; background:linear-gradient(165deg, rgba(34,26,13,.92), rgba(16,12,7,.95)); border:1px solid rgba(199,130,14,.16); box-shadow:0 34px 60px -30px rgba(0,0,0,.95), 0 2px 0 rgba(255,255,255,.02), inset 0 1px 0 rgba(255,255,255,.05); transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s; transform-style:preserve-3d;">
+        <div class="g1-card" data-tilt style="grid-column:span {{ sec.span }}; position:relative; border-radius:20px; background:linear-gradient(165deg, rgba(34,26,13,.92), rgba(16,12,7,.95)); border:1px solid rgba(199,130,14,.16); box-shadow:0 34px 60px -30px rgba(0,0,0,.95), 0 2px 0 rgba(255,255,255,.02), inset 0 1px 0 rgba(255,255,255,.05); transition:transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .18s; transform-style:preserve-3d;">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 22px 16px; border-bottom:1px solid rgba(199,130,14,.1);">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:{{ sec.dot }}; box-shadow:0 0 12px {{ sec.dot }};"></span>
+            <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+              <span style="width:10px; height:10px; border-radius:50%; flex-shrink:0; background:{{ sec.dot }}; box-shadow:0 0 12px {{ sec.dot }};"></span>
               <span style="font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px; color:#f4efe6; letter-spacing:.01em;">{{ sec.title }}</span>
-              <span style="font-size:12px; font-weight:600; color:#0A0A0A; background:#c7820e; border-radius:999px; padding:2px 9px;">{{ sec.count }}</span>
+              <span style="font-size:12px; font-weight:600; color:#0A0A0A; background:#c7820e; border-radius:999px; padding:2px 9px; flex-shrink:0;">{{ sec.count }}</span>
             </div>
-            <span style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#805f3f; padding:4px 9px; border-radius:6px; background:rgba(199,130,14,.08);">{{ sec.source }}</span>
+            <span style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#805f3f; padding:4px 9px; border-radius:6px; background:rgba(199,130,14,.08); flex-shrink:0;">{{ sec.source }}</span>
           </div>
-          <div class="om-scroll" style="padding:8px 12px 14px; max-height:360px; overflow:auto;">
+
+          <div class="om-scroll g1-scroll" style="padding:8px 12px 10px;">
             <sc-for list="{{ sec.items }}" as="item" hint-placeholder-count="3">
-              <div style="position:relative; display:flex; align-items:flex-start; gap:12px; padding:13px 12px; border-radius:12px;" style-hover="background:rgba(199,130,14,.06);">
-                <span style="margin-top:5px; width:8px; height:8px; border-radius:2px; flex-shrink:0; background:{{ item.pill }}; box-shadow:0 0 8px {{ item.pill }};"></span>
-                <div style="flex:1; min-width:0;">
-                  <div style="font-size:14.5px; font-weight:500; color:#f0e9dc; line-height:1.35;">{{ item.title }}</div>
-                  <div style="font-size:12px; color:#8a8072; margin-top:4px;">{{ item.meta }}</div>
-                </div>
-                <div style="position:relative; flex-shrink:0;">
-                  <button onClick="{{ item.onToggle }}" style="display:flex; align-items:center; gap:6px; padding:6px 11px; border-radius:9px; border:1px solid rgba(199,130,14,.28); background:rgba(199,130,14,.08); color:#e0b968; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;" style-hover="background:rgba(199,130,14,.16);">
+              <div style="border-radius:12px; margin-bottom:2px; background:{{ item.rowBg }}; transition:background .15s;">
+
+                <div style="display:flex; align-items:flex-start; gap:12px; padding:13px 12px;">
+                  <span style="margin-top:5px; width:8px; height:8px; border-radius:2px; flex-shrink:0; background:{{ item.pill }}; box-shadow:0 0 8px {{ item.pill }};"></span>
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-size:14.5px; font-weight:500; color:#f0e9dc; line-height:1.35;">{{ item.title }}</div>
+                    <div style="font-size:12px; color:#8a8072; margin-top:4px;">{{ item.meta }}</div>
+                  </div>
+                  <button onClick="{{ item.onToggle }}" style="display:flex; align-items:center; gap:6px; flex-shrink:0; padding:7px 12px; border-radius:9px; border:1px solid {{ item.btnBorder }}; background:{{ item.btnBg }}; color:#e0b968; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .15s, border-color .15s;" style-hover="background:rgba(199,130,14,.2);">
                     Action
-                    <span style="font-size:9px; opacity:.8;">▾</span>
+                    <span style="font-size:9px; opacity:.85;">{{ item.caret }}</span>
                   </button>
-                  <sc-if value="{{ item.isOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="position:absolute; top:calc(100% + 8px); right:0; z-index:40; min-width:186px; padding:6px; border-radius:13px; background:linear-gradient(165deg,#241a0d,#120d07); border:1px solid rgba(199,130,14,.3); box-shadow:0 26px 46px -14px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.08);">
-                      <div style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#805f3f; padding:6px 10px 8px;">Automated action</div>
+                </div>
+
+                <!-- Action panel renders INLINE (in normal flow), so it can never be
+                     clipped by the scroll container and never sits under an overlay. -->
+                <sc-if value="{{ item.isOpen }}" hint-placeholder-val="{{ false }}">
+                  <div data-action-panel style="margin:0 12px 12px 32px; padding:6px; border-radius:13px; background:linear-gradient(165deg,#241a0d,#120d07); border:1px solid rgba(199,130,14,.3); box-shadow:0 18px 34px -16px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.08); animation:panelIn .16s cubic-bezier(.2,.8,.2,1);">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px 8px;">
+                      <span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#805f3f;">Automated action</span>
+                      <button onClick="{{ item.onToggle }}" style="border:none; background:transparent; color:#805f3f; font-size:14px; line-height:1; cursor:pointer; padding:2px 4px;" style-hover="color:#e0b968;">✕</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:4px;">
                       <sc-for list="{{ item.actions }}" as="act" hint-placeholder-count="4">
-                        <button onClick="{{ act.onClick }}" style="display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:9px 10px; border-radius:8px; border:none; background:transparent; color:#e7ddca; font-size:13.5px; font-weight:500; cursor:pointer;" style-hover="background:rgba(199,130,14,.16);">
-                          <span style="font-size:14px;">{{ act.icon }}</span>
+                        <button onClick="{{ act.onClick }}" style="display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px; border-radius:8px; border:none; background:transparent; color:#e7ddca; font-size:13.5px; font-weight:500; cursor:pointer; transition:background .15s;" style-hover="background:rgba(199,130,14,.16);">
+                          <span style="font-size:14px; flex-shrink:0;">{{ act.icon }}</span>
                           {{ act.label }}
                         </button>
                       </sc-for>
                     </div>
-                  </sc-if>
-                </div>
+                  </div>
+                </sc-if>
+
               </div>
             </sc-for>
           </div>
+
+          <sc-if value="{{ sec.scrollHint }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 22px 14px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#6b5a3c;">Scroll for more ↓</div>
+          </sc-if>
         </div>
       </sc-for>
     </div>
@@ -130,10 +179,6 @@
       Compiled by your scheduled task · Last sync {{ syncTime }} · Feeds: {{ feedList }}
     </div>
   </div>
-
-  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeMenu }}" style="position:fixed; inset:0; z-index:30;"></div>
-  </sc-if>
 
   <sc-if value="{{ toast }}" hint-placeholder-val="">
     <div style="position:fixed; bottom:28px; right:28px; z-index:60; display:flex; align-items:center; gap:14px; padding:15px 20px; border-radius:14px; background:linear-gradient(160deg,#2a1f0f,#150f08); border:1px solid rgba(199,130,14,.4); box-shadow:0 26px 50px -16px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.08); animation:toastIn .28s cubic-bezier(.2,.8,.2,1);">
@@ -161,11 +206,23 @@ class Component extends DCLogic {
       .catch(() => this.setState({ feedStatus: "sample" }));
   }
 
+  clearTilt() {
+    document.querySelectorAll('[data-tilt]').forEach((card) => {
+      if (card.style.transform) { card.style.transform = ''; card.style.boxShadow = ''; }
+    });
+  }
+
   componentDidMount() {
     this.loadFeed();
     this._poll = setInterval(() => this.loadFeed(), 300000); // refresh every 5 min
+
+    this._finePointer = window.matchMedia('(pointer: fine)').matches;
+
     this._move = (e) => {
-      if (this.props.enableTilt === false) return;
+      if (this.props.enableTilt === false || !this._finePointer) return;
+      // Freeze tilt while an action panel is open — a card that shifts under the
+      // cursor makes the action buttons hard to hit.
+      if (this.state.openId !== null) { this.clearTilt(); return; }
       document.querySelectorAll('[data-tilt]').forEach((card) => {
         const r = card.getBoundingClientRect();
         const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
@@ -182,8 +239,31 @@ class Component extends DCLogic {
       });
     };
     window.addEventListener('pointermove', this._move);
+
+    // Esc closes an open action panel
+    this._key = (e) => { if (e.key === 'Escape' && this.state.openId !== null) this.setState({ openId: null }); };
+    window.addEventListener('keydown', this._key);
   }
-  componentWillUnmount() { window.removeEventListener('pointermove', this._move); clearInterval(this._poll); }
+
+  componentWillUnmount() {
+    window.removeEventListener('pointermove', this._move);
+    window.removeEventListener('keydown', this._key);
+    clearInterval(this._poll);
+  }
+
+  // Bring a freshly-opened panel fully into view inside its scroll container
+  revealPanel() {
+    setTimeout(() => {
+      const el = document.querySelector('[data-action-panel]');
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 40);
+  }
+
+  toggleItem(id) {
+    this.clearTilt();
+    this.setState((s) => ({ openId: s.openId === id ? null : id }));
+    if (this.state.openId !== id) this.revealPanel();
+  }
 
   fire(label, subject) {
     if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
@@ -262,14 +342,21 @@ class Component extends DCLogic {
       dot: sec.dot,
       span: sec.span,
       count: sec.items.length,
+      // Hint appears when the list is long enough to overflow the scroll area
+      scrollHint: sec.items.length > 4,
       items: sec.items.map((it) => {
         const id = `${sec.key}-${idx++}`;
+        const isOpen = this.state.openId === id;
         return {
           title: it.title,
           meta: it.meta,
           pill: it.pill,
-          isOpen: this.state.openId === id,
-          onToggle: () => this.setState((s) => ({ openId: s.openId === id ? null : id })),
+          isOpen,
+          caret: isOpen ? "▴" : "▾",
+          rowBg: isOpen ? "rgba(199,130,14,.07)" : "transparent",
+          btnBg: isOpen ? "rgba(199,130,14,.22)" : "rgba(199,130,14,.08)",
+          btnBorder: isOpen ? "rgba(199,130,14,.55)" : "rgba(199,130,14,.28)",
+          onToggle: () => this.toggleItem(id),
           actions: this.actionsFor(sec.key).map((a) => ({
             label: a.label,
             icon: a.icon,
@@ -300,8 +387,6 @@ class Component extends DCLogic {
       statusColor: isLive ? "#6fcf7a" : this.state.feedStatus === "loading" ? "#e0b968" : "#805f3f",
       intention: this.state.intention,
       onIntention: (e) => this.setState({ intention: e.target.value }),
-      menuOpen: this.state.openId !== null,
-      closeMenu: () => this.setState({ openId: null }),
       toast: this.state.toast,
       sources: [{ name: "GitHub" }, { name: "Cloudflare" }, { name: "Google" }, { name: "Shopify" }],
       feedList: "GitHub · Cloudflare · Google · Shopify",
