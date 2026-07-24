@@ -1,6 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '503178326149166');
+  (function(){
+    var eid = (self.crypto && crypto.randomUUID) ? crypto.randomUUID()
+            : 'ev.' + Date.now() + '.' + Math.random().toString(36).slice(2);
+    fbq('track', 'PageView', {}, {eventID: eid});
+    var payload = JSON.stringify({
+      event_name: 'PageView',
+      event_id: eid,
+      event_source_url: location.href,
+      fbp: (document.cookie.match(/_fbp=([^;]+)/) || [])[1],
+      fbc: (document.cookie.match(/_fbc=([^;]+)/) || [])[1]
+    });
+    try {
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/capi', new Blob([payload], {type: 'application/json'}));
+      } else {
+        fetch('/capi', {method:'POST', headers:{'content-type':'application/json'}, body: payload, keepalive: true});
+      }
+    } catch (e) {}
+  })();
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=503178326149166&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My Tech Buddy — Your AI-Powered Tech Assistant</title>
