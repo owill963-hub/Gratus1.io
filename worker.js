@@ -1,13 +1,13 @@
 /**
  * Gratus1.io — Hybrid Worker: static assets + Meta Conversions API relay
  *   + private gate for the daily dashboard
- * Pixel: 1356026399874586 | Endpoint: POST /capi
+ * Pixel: 503178326149166 | Endpoint: POST /capi
  * Token: wrangler secret META_CAPI_TOKEN (endpoint returns 503 until set)
  * Dashboard key: wrangler secret DASHBOARD_KEY (gate returns 503 until set)
  * Dashboard: clean URL /status-board  →  serves "Daily Dashboard.html"
  *            first visit /status-board?key=YOUR_SECRET  sets a 1yr cookie
  */
-const PIXEL_ID = "1356026399874586";
+const PIXEL_ID = "503178326149166";
 const GRAPH_VERSION = "v21.0";
 const ALLOWED_HOST_SUFFIX = "gratus1.io";
 
