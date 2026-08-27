@@ -102,7 +102,6 @@
   @keyframes nbfloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   @keyframes nbdrift { 0% { transform: translate(0,0); } 50% { transform: translate(2%,-2%); } 100% { transform: translate(0,0); } }
 </style>
-<script src="./image-slot.js"></script>
 </helmet>
 <div id="nb" style="--gold:#8BAA4E;--goldb:#FFCD00;--bronze:#DF362A;--aurora:#6952A7;--warm:#FDFCFC;--muted:#8F89A6;--line:rgba(139,170,78,0.26);position:relative;min-height:100vh;background:radial-gradient(ellipse 120% 80% at 50% -10%,#1B1636 0%,#120E24 40%,#0A0814 100%);color:#FDFCFC;font-family:'Space Grotesk',system-ui,sans-serif;overflow-x:hidden;">
 
@@ -340,20 +339,20 @@
       </div>
       <div id="nb-wheel-scene" style="position:relative;height:300px;margin-top:30px;perspective:1400px;cursor:grab;touch-action:pan-y;">
         <div id="nb-wheel" style="position:absolute;inset:0;transform-style:preserve-3d;will-change:transform;">
-          <a href="https://www.tiktok.com/@gratus_one" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(0deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);">
-            <image-slot id="soc-tiktok" shape="circle" placeholder="Drop TikTok post"></image-slot>
+          <a href="https://www.tiktok.com/@gratus_one" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(0deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);backface-visibility:hidden;-webkit-backface-visibility:hidden;">
+            <img id="soc-img-tiktok" src="/tiktok.webp" alt="Gratus1 on TikTok" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;left:0;right:0;bottom:0;padding:28px 12px 16px;text-align:center;background:linear-gradient(180deg,transparent,rgba(10,8,20,0.85));pointer-events:none;"><div style="font-weight:600;font-size:15px;">TikTok</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--gold);">@gratus_one →</div></div>
           </a>
-          <a href="https://www.instagram.com/gratus_one/" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(90deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);">
-            <image-slot id="soc-instagram" shape="circle" placeholder="Drop Instagram post"></image-slot>
+          <a href="https://www.instagram.com/gratus_one/" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(90deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);backface-visibility:hidden;-webkit-backface-visibility:hidden;">
+            <img id="soc-img-instagram" src="/instagram.webp" alt="Gratus1 on Instagram" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;left:0;right:0;bottom:0;padding:28px 12px 16px;text-align:center;background:linear-gradient(180deg,transparent,rgba(10,8,20,0.85));pointer-events:none;"><div style="font-weight:600;font-size:15px;">Instagram</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--gold);">@gratus_one →</div></div>
           </a>
-          <a href="https://www.facebook.com/owilliamsLLC/" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(180deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);">
-            <image-slot id="soc-facebook" shape="circle" placeholder="Drop Facebook post"></image-slot>
+          <a href="https://www.facebook.com/owilliamsLLC/" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(180deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);backface-visibility:hidden;-webkit-backface-visibility:hidden;">
+            <img id="soc-img-facebook" src="/facebook.webp" alt="O Williams LLC on Facebook" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;left:0;right:0;bottom:0;padding:28px 12px 16px;text-align:center;background:linear-gradient(180deg,transparent,rgba(10,8,20,0.85));pointer-events:none;"><div style="font-weight:600;font-size:15px;">Facebook</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--gold);">owilliamsLLC →</div></div>
           </a>
-          <a href="https://www.youtube.com/@VibrationalSync" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(270deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);">
-            <image-slot id="soc-youtube" shape="circle" placeholder="Drop YouTube thumbnail"></image-slot>
+          <a href="https://www.youtube.com/@VibrationalSync" target="_blank" rel="noopener" style="position:absolute;top:50%;left:50%;width:212px;height:212px;margin:-106px 0 0 -106px;transform:rotateY(270deg) translateZ(190px);border-radius:50%;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,0.04);box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 40px rgba(139,170,78,.14);color:var(--warm);backface-visibility:hidden;-webkit-backface-visibility:hidden;">
+            <img id="soc-img-youtube" src="/youtube.webp" alt="Vibrational Sync on YouTube" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
             <div style="position:absolute;left:0;right:0;bottom:0;padding:28px 12px 16px;text-align:center;background:linear-gradient(180deg,transparent,rgba(10,8,20,0.85));pointer-events:none;"><div style="font-weight:600;font-size:15px;">YouTube</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--gold);">@VibrationalSync →</div></div>
           </a>
         </div>
