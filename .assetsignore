@@ -19,3 +19,15 @@ Tactical Vibes.html
 
 # Wrangler build output (never publish sourcemaps)
 .wrangler
+
+# macOS Finder metadata — leaks a directory listing of the folder it was
+# written from, including names of files since deleted. Never web-serve it.
+.DS_Store
+**/.DS_Store
+
+# Design-tool export bundle: contains duplicate copies of the same *.dc.html
+# pages plus 2 MB of images already served from root. Publishing it wastes
+# crawl budget and creates duplicate content. Audited 2026-08-29 — no
+# credentials inside, but no reason to serve it either.
+Gratus1 JARVIS operator console.zip
+Gratus1 JARVIS operator console/
