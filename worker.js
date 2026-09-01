@@ -36,12 +36,34 @@ const LEGACY_REDIRECTS = {
   "/tacticalvibes.html": "/tactical-vibes",
 };
 
+// Apple App Site Association — App Clip + universal links for Tactical Vibes.
+// Served inline (not from the asset bucket) so it is always application/json, never redirected,
+// and never subject to the .well-known handling of the static layer.
+const TV_TEAM_APP_ID = "RKTX4UNR7Y.io.gratus1.tacticalvibes";
+const AASA = {
+  appclips: { apps: [TV_TEAM_APP_ID + ".Clip"] },
+  applinks: { details: [{ appIDs: [TV_TEAM_APP_ID], components: [{ "/": "/clip/*" }] }] },
+};
+const TV_APP_STORE_URL = "https://apps.apple.com/us/app/tactical-vibes/id6776399589";
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (url.pathname === "/capi" && request.method === "POST") {
       return handleCapi(request, env);
+    }
+
+    if (url.pathname === "/.well-known/apple-app-site-association" || url.pathname === "/apple-app-site-association") {
+      return new Response(JSON.stringify(AASA), {
+        headers: { "content-type": "application/json", "cache-control": "public, max-age=3600" },
+      });
+    }
+
+    // App Clip invocation URLs. iOS intercepts these before they reach us; anything that does
+    // arrive is a non-iOS client (or an iPhone without the clip) → send it to the App Store listing.
+    if (url.pathname === "/clip" || url.pathname.startsWith("/clip/")) {
+      return Response.redirect(TV_APP_STORE_URL, 302);
     }
 
     // Normalize optional trailing slash (but keep "/" itself)
