@@ -917,13 +917,17 @@ const AGENT_PANEL_BOOT = `
   function pct(n,d){return d>0?Math.round(n/d*100):0;}
   function set(id,html){var e=document.getElementById(id); if(e) e.innerHTML=html;}
 
-  function hbars(rows){                       // capacity-style horizontal bars
+  // Rows arrive pre-sorted by size, which is the same order the donut lays its
+  // outer ring in, so bar i and ring segment i are the same platform colour.
+  function hbars(rows){
     if(!rows.length) return '<div class="none">no data yet</div>';
     var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
-    return rows.map(function(r){
+    return rows.map(function(r,i){
+      var c=PAL[i%PAL.length];
       return '<div class="bar-row"><span style="color:var(--dim);text-align:right">'+esc(r[0])+
-        '</span><div class="bar" style="width:'+Math.max(3,r[1]/max*100)+'%"></div>'+
-        '<b style="color:var(--cy2)">'+r[1]+'</b></div>';
+        '</span><div class="bar" style="width:'+Math.max(3,r[1]/max*100)+
+        '%;background:linear-gradient(90deg,'+c+'88,'+c+');box-shadow:0 0 10px '+c+'55"></div>'+
+        '<b style="color:'+c+'">'+r[1]+'</b></div>';
     }).join('');
   }
   function sliders(rows){                     // task-completion-style sliders
@@ -1091,7 +1095,9 @@ const AGENT_PANEL_BOOT = `
   function loadAgents(){
     return fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
       var P=d.platforms||{}, names=Object.keys(P);
-      var qrows=names.map(function(n){return [n,P[n].queued];}).sort(function(a,b){return b[1]-a[1];});
+      var order=Object.keys(P).filter(function(n){return (P[n].queued||0)>0;})
+        .sort(function(x,y){return P[y].queued-P[x].queued;});
+      var qrows=order.map(function(n){return [n,P[n].queued];});
       set('ap-cap',hbars(qrows));
       set('ap-donut',donut(P));
       set('ap-mtx',matrix(P));
