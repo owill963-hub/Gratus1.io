@@ -347,7 +347,21 @@ function setSection(feed, key, patch) {
 
 // ── Postiz → "social" section ────────────────────────────────────────────────
 async function updatePostiz(feed, env) {
-  if (!env.POSTIZ_API_KEY) return; // secret absent → leave last-good slice
+  // A slice that cannot refresh must say so. Returning quietly here is what let
+  // the board present seed data as though it were live: the secret was never
+  // set on this worker, so this branch had been taken on every cron run since
+  // the feed shipped, and nothing on the page or in the JSON gave that away.
+  if (!env.POSTIZ_API_KEY) {
+    setSection(feed, "social", {
+      source: "Postiz · NOT LIVE",
+      items: [{
+        title: "Social slice is not refreshing",
+        meta: "POSTIZ_API_KEY is not set on this worker — figures below are seed data",
+        pill: "#e05b5b",
+      }],
+    });
+    return;
+  }
   const base = env.POSTIZ_API_BASE || "https://api.postiz.com/public/v1";
   const now = new Date();
   const start = now.toISOString().slice(0, 19) + "Z";
@@ -356,7 +370,22 @@ async function updatePostiz(feed, env) {
   const res = await fetch(`${base}/posts?startDate=${start}&endDate=${end}&limit=200`, {
     headers: { Authorization: env.POSTIZ_API_KEY, "content-type": "application/json" },
   });
-  if (!res.ok) throw new Error("postiz " + res.status);
+  if (!res.ok) {
+    // Same principle on a failed fetch: 401 after a token rotation, or 429 from
+    // the shared quota, must be visible rather than leaving yesterday's numbers
+    // in place looking current.
+    setSection(feed, "social", {
+      source: "Postiz · STALE",
+      items: [{
+        title: `Postiz refresh failed (HTTP ${res.status})`,
+        meta: res.status === 429
+          ? "Shared rate limit exhausted — another consumer burned the quota"
+          : "Figures below are the last good values, not current",
+        pill: "#e05b5b",
+      }],
+    });
+    return;
+  }
   const body = await res.json();
   const posts = Array.isArray(body) ? body : (body.data || body.posts || []);
 
