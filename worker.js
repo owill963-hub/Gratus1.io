@@ -801,16 +801,19 @@ async function recordBeat(agent, status, detail, env, extra) {
   await env.FEED_KV.put(histKey(agent), JSON.stringify(runs));
 }
 
-// ── Control panel markup, injected into /status-board ────────────────────────
+// ── Unified operations console ───────────────────────────────────────────────
+// One document, one visual language. The old Daily Review Console used to be
+// framed in below this panel in its own colours; its content (KPIs, tasks,
+// blockers, content queue, portfolio digest) is now fetched from /feed.json and
+// rendered in the HUD's own styling, so there is a single page rather than two
+// stacked designs.
 function statusBoardShell() {
   return '<!DOCTYPE html><html><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-    '<title>Status board</title>' +
-    '<style>html,body{margin:0;background:#0b0912;}' +
-    'iframe{display:block;width:100%;height:100vh;border:0;}</style>' +
-    '</head><body>' + AGENT_PANEL_BOOT +
-    '<iframe src="/status-board/board" title="Daily dashboard" loading="eager"></iframe>' +
-    '</body></html>';
+    '<meta name="robots" content="noindex, nofollow">' +
+    '<title>Gratus1 Operations</title>' +
+    '<style>html,body{margin:0;background:#03070f;min-height:100%;}</style>' +
+    '</head><body>' + AGENT_PANEL_BOOT + '</body></html>';
 }
 
 
@@ -820,18 +823,37 @@ const AGENT_PANEL_BOOT = `
     --panel:rgba(9,20,38,.78);--line:rgba(41,182,246,.28);
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
     background:radial-gradient(1200px 600px at 50% -10%,#0d2340 0%,#050b17 60%,#03070f 100%);
-    padding:18px clamp(12px,2vw,26px) 26px;}
+    padding:18px clamp(12px,2vw,26px) 40px;min-height:100vh;box-sizing:border-box;}
   #ap-hud h1{margin:0;text-align:center;font-size:clamp(18px,2.4vw,30px);letter-spacing:.06em;
     color:var(--cy2);text-shadow:0 0 18px rgba(41,182,246,.55);font-weight:700;}
-  #ap-hud .rule{display:flex;align-items:center;gap:10px;margin:8px 0 16px;}
+  #ap-hud .rule{display:flex;align-items:center;gap:10px;margin:8px 0 10px;}
   #ap-hud .rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);}
   #ap-hud .rule b{width:8px;height:8px;transform:rotate(45deg);background:var(--cy);box-shadow:0 0 10px var(--cy);}
+  #ap-hud .intent{text-align:center;font-size:12.5px;color:var(--dim);margin:0 0 16px;letter-spacing:.02em;}
+  #ap-hud .intent em{color:var(--cy2);font-style:normal;}
   #ap-hud .grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr);}
   #ap-hud .p{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
-    backdrop-filter:blur(3px);}
-  #ap-hud .p h2{margin:0 0 12px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cy2);}
+    backdrop-filter:blur(3px);min-width:0;}
+  #ap-hud .p h2{margin:0 0 12px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cy2);
+    display:flex;align-items:center;gap:8px;}
+  #ap-hud .p h2 small{margin-left:auto;font-size:10px;letter-spacing:.06em;color:var(--dim);
+    text-transform:none;font-weight:400;}
+  #ap-hud .p h2 u{width:7px;height:7px;border-radius:50%;text-decoration:none;flex:none;}
   #ap-hud .s6{grid-column:span 6;} #ap-hud .s4{grid-column:span 4;} #ap-hud .s12{grid-column:span 12;}
   @media(max-width:900px){#ap-hud .s6,#ap-hud .s4{grid-column:span 12;}}
+  #ap-hud .none{opacity:.6;font-size:12px;}
+
+  /* KPI strip */
+  #ap-hud .kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:14px;}
+  #ap-hud .kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+    position:relative;overflow:hidden;}
+  #ap-hud .kpi::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc,var(--cy));}
+  #ap-hud .kpi .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+  #ap-hud .kpi .v{font-size:clamp(20px,2.4vw,28px);font-weight:700;color:var(--cy2);line-height:1.15;margin:4px 0 2px;
+    text-shadow:0 0 14px rgba(41,182,246,.35);}
+  #ap-hud .kpi .d{font-size:11px;}
+
+  /* charts + bars */
   #ap-hud .bar-row{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:8px;margin:7px 0;font-size:12px;}
   #ap-hud .bar{height:14px;border-radius:3px;background:linear-gradient(90deg,var(--cy),var(--cy2));
     box-shadow:0 0 10px rgba(41,182,246,.45);}
@@ -841,27 +863,62 @@ const AGENT_PANEL_BOOT = `
     box-shadow:0 0 8px rgba(255,255,255,.8);transform:translateX(-7px);}
   #ap-hud .slab{margin:12px 0;font-size:12px;}
   #ap-hud .slab .lab{text-align:right;color:var(--cy2);margin-bottom:5px;font-weight:600;}
+
+  /* donut legend: platform rows with campaign sub-rows */
+  #ap-hud .lgp{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:4px 0 2px;
+    border-top:1px solid rgba(41,182,246,.14);margin-top:4px;font-weight:600;}
+  #ap-hud .lgp:first-child{border-top:0;margin-top:0;}
+  #ap-hud .lgc{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:1px 0 1px 14px;color:var(--dim);}
+  #ap-hud .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle;}
+
+  /* matrix */
+  #ap-hud .wrap{overflow-x:auto;}
+  #ap-hud table{border-collapse:collapse;width:100%;font-size:12px;min-width:520px;}
+  #ap-hud th,#ap-hud td{padding:6px 9px;text-align:right;border-bottom:1px solid rgba(41,182,246,.14);white-space:nowrap;}
+  #ap-hud th:first-child,#ap-hud td:first-child{text-align:left;}
+  #ap-hud thead th{color:var(--cy2);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:600;}
+  #ap-hud tfoot td{font-weight:700;color:var(--cy2);border-bottom:0;border-top:1px solid var(--line);}
+  #ap-hud td .q{color:var(--ink);} #ap-hud td .s{color:var(--dim);}
+
+  /* agent + feed cards */
   #ap-hud .cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
   #ap-hud .card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-left-width:3px;
     border-radius:8px;padding:12px 14px;}
   #ap-hud .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin-top:6px;}
+  #ap-hud .item{display:grid;grid-template-columns:8px 1fr;gap:9px;padding:8px 0;
+    border-top:1px solid rgba(41,182,246,.12);}
+  #ap-hud .item:first-child{border-top:0;padding-top:0;}
+  #ap-hud .item u{width:8px;height:8px;border-radius:50%;margin-top:5px;text-decoration:none;}
+  #ap-hud .item .t{font-size:12.5px;line-height:1.35;}
+  #ap-hud .item .m{font-size:11px;color:var(--dim);margin-top:3px;}
   #ap-hud button{font:inherit;font-size:11px;padding:5px 11px;border-radius:5px;cursor:pointer;
     border:1px solid var(--line);background:rgba(41,182,246,.10);color:var(--ink);}
   #ap-hud button:hover{background:rgba(41,182,246,.22);}
   #ap-hud .kv{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;}
+  #ap-hud .foot{text-align:center;font-size:10.5px;color:var(--dim);letter-spacing:.08em;margin-top:18px;}
 </style>
 <script>
 (function(){
   var C={cy:'#29b6f6',cy2:'#4fc3f7',mag:'#e0509a',pur:'#7e57c2',bad:'#ff5c7a',ok:'#43d67c'};
-  var PAL=[C.cy,C.mag,C.pur,'#26c6da','#ab47bc'];
+  // Two colour axes that must never be confused for each other: platforms get a
+  // cyan ramp (the HUD's own family), campaigns get their brand colours. So a
+  // hue in the outer ring always means "channel" and a hue in the inner ring
+  // always means "brand", on the donut, in the legend and in the ledger alike.
+  var PAL=['#7fd7ff','#4fc3f7','#29b6f6','#1e88c7','#186a9b','#12506f'];
+  var CPAL={'Tactical Vibes':'#ef9f27','My Tech Buddy':'#e0509a',
+            'O Williams Consulting':'#7e57c2','Other / coffee':'#a1887f'};
+  var CFALL=['#ef9f27','#e0509a','#7e57c2','#a1887f','#43d67c','#ab47bc'];
+  var CORD=['Tactical Vibes','My Tech Buddy','O Williams Consulting','Other / coffee'];
+  function ccol(l,i){return CPAL[l]||CFALL[i%CFALL.length];}
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function ago(iso){if(!iso)return 'never';var m=Math.round((Date.now()-Date.parse(iso))/60000);
     if(m<60)return m+'m';var h=Math.round(m/60);return h<48?h+'h':Math.round(h/24)+'d';}
   function pct(n,d){return d>0?Math.round(n/d*100):0;}
+  function set(id,html){var e=document.getElementById(id); if(e) e.innerHTML=html;}
 
   function hbars(rows){                       // capacity-style horizontal bars
-    if(!rows.length) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
+    if(!rows.length) return '<div class="none">no data yet</div>';
     var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
     return rows.map(function(r){
       return '<div class="bar-row"><span style="color:var(--dim);text-align:right">'+esc(r[0])+
@@ -877,27 +934,88 @@ const AGENT_PANEL_BOOT = `
         '<div class="knob" style="left:'+v+'%"></div></div></div>';
     }).join('');
   }
-  function donut(rows){                       // source-of-power-style donut
-    var tot=rows.reduce(function(a,r){return a+r[1];},0);
-    if(!tot) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
-    var cx=95,cy=95,r=62,w=22,a=-Math.PI/2,out='',legend='';
-    rows.forEach(function(row,i){
-      var frac=row[1]/tot, a2=a+frac*Math.PI*2, large=frac>0.5?1:0;
-      var x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
-      out+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+'" fill="none" stroke="'+
-        PAL[i%PAL.length]+'" stroke-width="'+w+'"/>';
-      legend+='<div class="kv"><span style="color:'+PAL[i%PAL.length]+'">'+esc(row[0])+'</span>'+
-        '<span>'+(frac*100).toFixed(1)+'%</span></div>';
+  // Two concentric rings: the outer one splits the queue by platform, the inner
+  // one subdivides each platform wedge by the campaign that produced the posts.
+  // A campaign that stops feeding a channel shows up as a missing inner slice.
+  function donut(P){
+    var names=Object.keys(P||{}).filter(function(n){return (P[n].queued||0)>0;})
+      .sort(function(x,y){return P[y].queued-P[x].queued;});
+    var tot=names.reduce(function(a,n){return a+P[n].queued;},0);
+    if(!tot) return '<div class="none">no data yet</div>';
+    var cx=112,cy=112,GAP=0.014,a=-Math.PI/2,outer='',inner='',legend='';
+    function arc(r,a1,a2){
+      var big=(a2-a1)>Math.PI?1:0;
+      return '<path d="M'+(cx+r*Math.cos(a1)).toFixed(2)+' '+(cy+r*Math.sin(a1)).toFixed(2)+
+        ' A'+r+' '+r+' 0 '+big+' 1 '+(cx+r*Math.cos(a2)).toFixed(2)+' '+(cy+r*Math.sin(a2)).toFixed(2)+'"';
+    }
+    names.forEach(function(n,i){
+      var pc=PAL[i%PAL.length], sweep=(P[n].queued/tot)*Math.PI*2, a2=a+sweep;
+      outer+=arc(92,a+GAP,Math.max(a+GAP+0.002,a2-GAP))+' fill="none" stroke="'+pc+
+        '" stroke-width="13" stroke-linecap="butt"/>';
+      var camps=P[n].campaigns||{};
+      var keys=Object.keys(camps).filter(function(k){return (camps[k].queued||0)>0;})
+        .sort(function(x,y){var ix=CORD.indexOf(x),iy=CORD.indexOf(y);
+          return (ix<0?9:ix)-(iy<0?9:iy);});
+      var csum=keys.reduce(function(s,k){return s+camps[k].queued;},0)||1;
+      var b=a;
+      keys.forEach(function(k,j){
+        var b2=b+(camps[k].queued/csum)*sweep;
+        inner+=arc(70,b+GAP,Math.max(b+GAP+0.002,b2-GAP))+' fill="none" stroke="'+ccol(k,j)+
+          '" stroke-width="17" opacity=".95"/>';
+        b=b2;
+      });
+      legend+='<div class="lgp"><span><i class="dot" style="background:'+pc+'"></i>'+esc(n)+
+        '</span><span>'+P[n].queued+' &middot; '+(P[n].queued/tot*100).toFixed(0)+'%</span></div>';
+      keys.forEach(function(k,j){
+        legend+='<div class="lgc"><span><i class="dot" style="background:'+ccol(k,j)+
+          ';opacity:.85"></i>'+esc(k)+'</span><span>'+camps[k].queued+'</span></div>';
+      });
       a=a2;
     });
-    return '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">'+
-      '<svg viewBox="0 0 190 190" style="width:150px;height:150px;flex:none">'+out+
-      '<text x="95" y="90" text-anchor="middle" fill="'+C.cy2+'" font-size="26" font-weight="700">'+tot+
-      '</text><text x="95" y="108" text-anchor="middle" fill="#7f9dbd" font-size="10">QUEUED</text></svg>'+
-      '<div style="flex:1;min-width:120px">'+legend+'</div></div>';
+    return '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">'+
+      '<svg viewBox="0 0 224 224" style="width:190px;height:190px;flex:none">'+outer+inner+
+      '<text x="112" y="107" text-anchor="middle" fill="'+C.cy2+'" font-size="30" font-weight="700">'+tot+
+      '</text><text x="112" y="126" text-anchor="middle" fill="#7f9dbd" font-size="9.5" '+
+      'letter-spacing="1.4">QUEUED</text></svg>'+
+      '<div style="flex:1;min-width:190px">'+legend+'</div></div>';
   }
-  function area(series){                      // hourly-generation-style area chart
-    if(!series||series.length<2) return '<div style="opacity:.6;font-size:12px">not enough history yet</div>';
+  // The same split as a ledger: every platform x campaign cell, queued and sent.
+  function matrix(P){
+    var names=Object.keys(P||{}).sort();
+    if(!names.length) return '<div class="none">no data yet</div>';
+    var cols=[];
+    names.forEach(function(n){Object.keys(P[n].campaigns||{}).forEach(function(k){
+      if(cols.indexOf(k)<0) cols.push(k);});});
+    if(!cols.length) return '<div class="none">campaign attribution lands on the next nightly run</div>';
+    cols.sort(function(x,y){var ix=CORD.indexOf(x),iy=CORD.indexOf(y);return (ix<0?9:ix)-(iy<0?9:iy);});
+    var head='<tr><th>Platform</th>'+cols.map(function(k,j){
+      return '<th><i class="dot" style="background:'+ccol(k,j)+'"></i>'+esc(k)+'</th>';}).join('')+
+      '<th>Total</th><th>Last out</th></tr>';
+    var tq=cols.map(function(){return 0;}), tp=cols.map(function(){return 0;});
+    var body=names.map(function(n){
+      var camps=P[n].campaigns||{};
+      var cells=cols.map(function(k,j){
+        var c=camps[k];
+        if(!c||(!c.queued&&!c.published)) return '<td style="opacity:.28">&ndash;</td>';
+        tq[j]+=c.queued; tp[j]+=c.published;
+        return '<td><span class="q">'+c.queued+'</span> <span class="s">/ '+c.published+'</span></td>';
+      }).join('');
+      var flag=(P[n].overdue||P[n].no_release)?
+        ' <span style="color:'+C.bad+'">&#9679;</span>':'';
+      return '<tr><td>'+esc(n)+flag+'</td>'+cells+
+        '<td><span class="q">'+P[n].queued+'</span> <span class="s">/ '+P[n].published+'</span></td>'+
+        '<td class="s">'+(P[n].last_published?esc(P[n].last_published.slice(5,16).replace('T',' ')):'never')+'</td></tr>';
+    }).join('');
+    var foot='<tr><td>All</td>'+cols.map(function(k,j){
+      return '<td><span class="q">'+tq[j]+'</span> <span class="s">/ '+tp[j]+'</span></td>';}).join('')+
+      '<td><span class="q">'+tq.reduce(function(a,b){return a+b;},0)+'</span> <span class="s">/ '+
+      tp.reduce(function(a,b){return a+b;},0)+'</span></td><td></td></tr>';
+    return '<div class="wrap"><table><thead>'+head+'</thead><tbody>'+body+'</tbody><tfoot>'+foot+
+      '</tfoot></table></div><div class="none" style="margin-top:8px">queued / published &middot; '+
+      'a red dot marks a platform with overdue or unconfirmed sends</div>';
+  }
+  function area(series){                      // scheduled volume per day
+    if(!series||series.length<2) return '<div class="none">not enough history yet</div>';
     var W=560,H=150,pad=26;
     var max=Math.max.apply(null,series.map(function(p){return p[1];}))||1;
     var step=(W-pad*2)/(series.length-1);
@@ -915,8 +1033,8 @@ const AGENT_PANEL_BOOT = `
       '<path d="'+fill+'" fill="url(#apg)"/><path d="'+line+'" fill="none" stroke="'+C.cy2+
       '" stroke-width="2"/><text x="4" y="14" fill="#7f9dbd" font-size="9">'+max+'</text>'+ticks+'</svg>';
   }
-  function vbars(series){                     // accumulated-output-style vertical bars
-    if(!series||!series.length) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
+  function vbars(series){                     // cumulative scheduled
+    if(!series||!series.length) return '<div class="none">no data yet</div>';
     var run=0, cum=series.map(function(p){run+=p[1];return [p[0],run];});
     var W=520,H=150,pad=26,max=cum[cum.length-1][1]||1;
     var bw=(W-pad*2)/cum.length*0.62, step=(W-pad*2)/cum.length;
@@ -954,26 +1072,31 @@ const AGENT_PANEL_BOOT = `
   var SHELL='<div id="ap-hud">'+
     '<h1>Gratus1 Operations Monitoring</h1>'+
     '<div class="rule"><i></i><b></b><span id="ap-sub" style="font-size:11px;color:#7f9dbd;letter-spacing:.08em"></span><b></b><i></i></div>'+
+    '<p class="intent" id="ap-intent"></p>'+
+    '<div class="kpis" id="ap-kpis"></div>'+
     '<div class="grid">'+
-      '<div class="p s6"><h2>Queued posts by platform</h2><div id="ap-cap"></div></div>'+
-      '<div class="p s6"><h2>Completion rate</h2><div id="ap-slid"></div></div>'+
-      '<div class="p s4"><h2>Queue share</h2><div id="ap-donut"></div></div>'+
-      '<div class="p s4"><h2>Scheduled volume per day</h2><div id="ap-area"></div></div>'+
-      '<div class="p s4"><h2>Cumulative scheduled</h2><div id="ap-vbar"></div></div>'+
+      '<div class="p s4"><h2>Queue by platform &amp; campaign</h2><div id="ap-donut"></div></div>'+
+      '<div class="p s4"><h2>Queued posts by platform</h2><div id="ap-cap"></div></div>'+
+      '<div class="p s4"><h2>Completion rate</h2><div id="ap-slid"></div></div>'+
+      '<div class="p s12"><h2>Platform &times; campaign ledger</h2><div id="ap-mtx"></div></div>'+
+      '<div class="p s6"><h2>Scheduled volume per day</h2><div id="ap-area"></div></div>'+
+      '<div class="p s6"><h2>Cumulative scheduled</h2><div id="ap-vbar"></div></div>'+
       '<div class="p s12"><h2>Agents</h2><div id="ap-rows" class="cards"></div></div>'+
-      '<div class="p s6"><h2>Redirector · link.gratus1.io</h2><div id="ap-redir"></div></div>'+
+      '<div class="p s6"><h2>Redirector &middot; link.gratus1.io</h2><div id="ap-redir"></div></div>'+
       '<div class="p s6"><h2>Credentials</h2><div id="ap-cred"></div></div>'+
-    '</div></div>';
+      '<div id="ap-feed" style="display:contents"></div>'+
+    '</div>'+
+    '<div class="foot" id="ap-foot"></div></div>';
 
-  function load(){
-    var host=document.getElementById('ap-hud'); if(!host) return;
-    fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
+  function loadAgents(){
+    return fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
       var P=d.platforms||{}, names=Object.keys(P);
       var qrows=names.map(function(n){return [n,P[n].queued];}).sort(function(a,b){return b[1]-a[1];});
-      document.getElementById('ap-cap').innerHTML=hbars(qrows);
-      document.getElementById('ap-donut').innerHTML=donut(qrows);
-      document.getElementById('ap-area').innerHTML=area(d.scheduled_by_day||[]);
-      document.getElementById('ap-vbar').innerHTML=vbars(d.scheduled_by_day||[]);
+      set('ap-cap',hbars(qrows));
+      set('ap-donut',donut(P));
+      set('ap-mtx',matrix(P));
+      set('ap-area',area(d.scheduled_by_day||[]));
+      set('ap-vbar',vbars(d.scheduled_by_day||[]));
 
       var sl=d.agents.map(function(a){
         return [a.label.split(' (')[0]+' success 7d', a.runs_7d? pct(a.runs_7d-a.errors_7d,a.runs_7d):100];});
@@ -986,28 +1109,67 @@ const AGENT_PANEL_BOOT = `
       var tot=names.reduce(function(a,n){return a+P[n].queued+P[n].published;},0);
       if(tot) sl.push(['Delivery clean', pct(tot-deliv,tot)]);
       if(d.credentials&&d.credentials.length){
-        sl.push(['PAT life remaining', Math.max(0,Math.min(100,Math.round(d.credentials[0].days_left/90*100)))]);
+        // Measured against the token's own life, not an assumed 90 days: this
+        // PAT runs 2026-08-27 to 2026-10-03, so 27 days left is under half gone.
+        var cr=d.credentials[0], span=cr.span_days||90;
+        sl.push(['PAT life remaining', Math.max(0,Math.min(100,Math.round(cr.days_left/span*100)))]);
       }
-      document.getElementById('ap-slid').innerHTML=sliders(sl);
+      set('ap-slid',sliders(sl));
 
-      document.getElementById('ap-rows').innerHTML=d.agents.map(agentCard).join('');
+      set('ap-rows',d.agents.map(agentCard).join(''));
       var okc2={301:1,302:1,307:1,308:1};
-      document.getElementById('ap-redir').innerHTML=(d.redirector||[]).map(function(r){
+      set('ap-redir',(d.redirector||[]).map(function(r){
         return '<div class="kv"><span>/'+esc(r.slug)+'</span><span style="color:'+
           (okc2[r.code]?C.ok:C.bad)+'">'+esc(r.code)+'</span></div>';}).join('')||
-        '<div style="opacity:.6;font-size:12px">no data yet</div>';
-      document.getElementById('ap-cred').innerHTML=(d.credentials||[]).map(function(c){
+        '<div class="none">no data yet</div>');
+      set('ap-cred',(d.credentials||[]).map(function(c){
+        var span=c.span_days||90, used=Math.max(0,Math.min(100,Math.round((span-c.days_left)/span*100)));
         return '<div class="kv"><span>'+esc(c.name)+'</span><span style="color:'+
-          (c.days_left<=14?C.bad:C.ok)+'">'+esc(c.expires)+' · '+c.days_left+'d</span></div>';}).join('')||
-        '<div style="opacity:.6;font-size:12px">no data yet</div>';
+          (c.days_left<=14?C.bad:C.ok)+'">'+c.days_left+'d left</span></div>'+
+          '<div class="track" style="margin:5px 0 4px"><div class="fill" style="width:'+used+
+          '%;background:linear-gradient(90deg,'+(c.days_left<=14?C.bad:C.cy)+','+C.pur+')"></div></div>'+
+          '<div class="kv" style="font-size:10.5px;color:var(--dim)"><span>issued '+
+          esc(c.issued||'?')+'</span><span>'+span+'-day token</span><span>expires '+esc(c.expires)+'</span></div>';
+      }).join('')||'<div class="none">no data yet</div>');
 
       var bad=d.agents.filter(function(a){return !a.healthy&&!a.paused_until;}).length;
-      document.getElementById('ap-sub').textContent=
+      var sub=document.getElementById('ap-sub');
+      if(sub) sub.textContent=
         (bad?bad+' AGENT'+(bad>1?'S':'')+' NEED ATTENTION':'ALL SYSTEMS NOMINAL')+
         ' · CHECKS '+(d.checks_at?ago(d.checks_at)+' AGO':'PENDING');
     }).catch(function(e){
       var sub=document.getElementById('ap-sub'); if(sub) sub.textContent='LOAD FAILED: '+e;});
   }
+
+  // The daily review content, rendered in this page's own styling rather than
+  // framed in from the old console.
+  function loadFeed(){
+    return fetch('/feed.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(f){
+      var it=document.getElementById('ap-intent');
+      if(it) it.innerHTML=f.intention?('TODAY&rsquo;S INTENTION &mdash; <em>'+esc(f.intention)+'</em>'):'';
+      set('ap-kpis',(f.kpis||[]).map(function(k){
+        return '<div class="kpi" style="--acc:'+esc(k.deltaColor||C.cy)+'">'+
+          '<div class="l">'+esc(k.label)+'</div><div class="v">'+esc(k.value)+'</div>'+
+          '<div class="d" style="color:'+esc(k.deltaColor||'#7f9dbd')+'">'+esc(k.delta||'')+'</div></div>';
+      }).join(''));
+      set('ap-feed',(f.sections||[]).map(function(s){
+        var items=(s.items||[]).map(function(i){
+          return '<div class="item"><u style="background:'+esc(i.pill||s.dot||C.cy)+'"></u><div>'+
+            '<div class="t">'+esc(i.title)+'</div>'+
+            (i.meta?'<div class="m">'+esc(i.meta)+'</div>':'')+'</div></div>';
+        }).join('')||'<div class="none">nothing open</div>';
+        return '<div class="p s6"><h2><u style="background:'+esc(s.dot||C.cy)+'"></u>'+esc(s.title)+
+          '<small>'+esc(s.source||'')+' &middot; '+(s.items||[]).length+'</small></h2>'+items+'</div>';
+      }).join(''));
+      var ft=document.getElementById('ap-foot');
+      if(ft) ft.textContent='DAILY REVIEW DATA GENERATED '+(f.generatedAt?ago(f.generatedAt)+' AGO':'—')+
+        ' · GRATUS1 · PRIVATE';
+    }).catch(function(e){
+      set('ap-feed','<div class="p s12"><h2>Daily review</h2><div class="none">feed load failed: '+
+        esc(String(e))+'</div></div>');});
+  }
+  function load(){ loadAgents(); loadFeed(); }
+
   function onClick(ev){
     var t=ev.target.closest&&ev.target.closest('button[data-agent]'); if(!t) return;
     var agent=t.dataset.agent, action=t.dataset.action;
@@ -1032,4 +1194,3 @@ const AGENT_PANEL_BOOT = `
   setInterval(load,60000);
 })();
 </script>`;
-
