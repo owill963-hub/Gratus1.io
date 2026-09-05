@@ -23,8 +23,8 @@ const PAGE_ROUTES = {
 // Private paths — only reachable with the access key / auth cookie.
 // Gate both the clean route AND the raw filename so the file can't be
 // reached directly, un-gated.
-const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json",
-                   "/agents.json", "/agent-control"];
+const PROTECTED = ["/status-board", "/status-board/board", "/Daily%20Dashboard.html",
+                   "/feed.json", "/agents.json", "/agent-control"];
 const DASH_COOKIE = "g1_dash";
 const FEED_KEY = "feed:current";
 // Agent heartbeats. Each scheduled agent posts here after a successful run, so
@@ -96,6 +96,14 @@ export default {
       if (gate) return gate;
     }
 
+    // The board itself, for the shell's iframe.
+    if (cleanPath === "/status-board/board") {
+      const boardUrl = new URL(request.url);
+      boardUrl.pathname = PAGE_ROUTES["/status-board"];
+      boardUrl.search = "";
+      return env.ASSETS.fetch(new Request(boardUrl, request));
+    }
+
     // Agent control panel data and actions. Both sit behind the dashboard gate
     // above — same session, no second credential to carry on a phone.
     if (cleanPath === "/agents.json") return agentsPanel(request, env);
@@ -112,20 +120,23 @@ export default {
       return Response.redirect(new URL(LEGACY_REDIRECTS[cleanPath] + url.search, url.origin), 301);
     }
 
+    // The status board is a self-extracting design bundle: on load its script
+    // rebuilds the whole document from blob: URLs, so anything injected into the
+    // served HTML is discarded before it runs. Verified — an injected panel was
+    // absent from documentElement.outerHTML entirely. So the panel is not
+    // injected into it; the board is framed instead, which isolates the bundle
+    // and leaves the panel in a document the bundle cannot touch.
+    if (cleanPath === "/status-board") {
+      return new Response(statusBoardShell(), {
+        headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" },
+      });
+    }
+
     // Clean-URL rewrite (runs only after the gate has passed)
     if (PAGE_ROUTES[cleanPath]) {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = PAGE_ROUTES[cleanPath];
-      const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
-      // The status board is a design-tool export; a re-export would clobber
-      // anything written into it. The agent panel is injected here instead, so
-      // it lives in code and survives the next export.
-      if (cleanPath === "/status-board") {
-        return new HTMLRewriter()
-          .on("body", new AgentPanelInjector())
-          .transform(assetResp);
-      }
-      return assetResp;
+      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     // Redirect direct hits on the raw .dc.html filenames to their clean URLs
@@ -725,27 +736,41 @@ async function recordBeat(agent, status, detail, env) {
 }
 
 // ── Control panel markup, injected into /status-board ────────────────────────
-class AgentPanelInjector {
-  element(el) {
-    el.append(AGENT_PANEL_HTML, { html: true });
-  }
+function statusBoardShell() {
+  return '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>Status board</title>' +
+    '<style>html,body{margin:0;background:#0b0912;}' +
+    'iframe{display:block;width:100%;height:100vh;border:0;}</style>' +
+    '</head><body>' + AGENT_PANEL_BOOT +
+    '<iframe src="/status-board/board" title="Daily dashboard" loading="eager"></iframe>' +
+    '</body></html>';
 }
 
-const AGENT_PANEL_HTML = `
-<section id="agent-panel" style="font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;max-width:1100px;margin:40px auto 64px;padding:0 20px;color:#e8e6f0;">
-  <h2 style="font-size:18px;letter-spacing:.02em;margin:0 0 4px;">Agents</h2>
-  <p id="ap-sub" style="margin:0 0 18px;font-size:13px;opacity:.6;">loading…</p>
-  <div id="ap-rows" style="display:grid;gap:10px;"></div>
-</section>
+
+const AGENT_PANEL_BOOT = `
 <script>
 (function(){
-  var R=document.getElementById('ap-rows'), S=document.getElementById('ap-sub');
+  var MARKUP =
+    '<section id="agent-panel" style="font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;' +
+    'max-width:1100px;margin:32px auto 56px;padding:20px;color:#e8e6f0;background:#12101c;' +
+    'border:1px solid rgba(255,255,255,.12);border-radius:14px;">' +
+      '<h2 style="font-size:17px;margin:0 0 4px;">Agents</h2>' +
+      '<p id="ap-sub" style="margin:0 0 16px;font-size:13px;opacity:.6;">loading…</p>' +
+      '<div id="ap-rows" style="display:grid;gap:10px;"></div>' +
+    '</section>';
+
   function ago(iso){ if(!iso) return 'never';
     var m=Math.round((Date.now()-Date.parse(iso))/60000);
     if(m<60) return m+'m ago'; var h=Math.round(m/60);
     return h<48 ? h+'h ago' : Math.round(h/24)+'d ago'; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function btn(agent,action,label){
+    return '<button data-agent="'+esc(agent)+'" data-action="'+action+'" '+
+      'style="font:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;'+
+      'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e8e6f0;">'+label+'</button>';
+  }
   function card(a){
     var colour = a.paused_until ? '#e0b968' : (a.healthy ? '#6fcf7a' : '#e05b5b');
     var state  = a.paused_until ? 'PAUSED until '+new Date(a.paused_until).toLocaleTimeString()
@@ -755,7 +780,7 @@ const AGENT_PANEL_HTML = `
       '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;">'+
         '<strong style="font-size:14px;">'+esc(a.label)+'</strong>'+
         '<span style="font-size:12px;color:'+colour+';font-weight:600;">'+esc(state)+
-        (a.acknowledged?' · ack\'d':'')+'</span></div>'+
+        (a.acknowledged?' · acknowledged':'')+'</span></div>'+
       '<div style="margin-top:8px;font-size:12px;opacity:.75;display:flex;gap:18px;flex-wrap:wrap;">'+
         '<span>last run '+ago(a.last_run)+'</span>'+
         '<span>last success '+ago(a.last_success)+'</span>'+
@@ -769,25 +794,20 @@ const AGENT_PANEL_HTML = `
         (a.healthy?'':btn(a.agent,'ack','Acknowledge'))+
       '</div></div>';
   }
-  function btn(agent,action,label){
-    return '<button data-agent="'+esc(agent)+'" data-action="'+action+'" '+
-      'style="font:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;'+
-      'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e8e6f0;">'+label+'</button>';
-  }
   function load(){
+    var R=document.getElementById('ap-rows'), S=document.getElementById('ap-sub');
+    if(!R) return;
     fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
       R.innerHTML = d.agents.map(card).join('');
       var bad = d.agents.filter(function(a){return !a.healthy && !a.paused_until;}).length;
-      S.textContent = bad ? bad+' agent'+(bad>1?'s':'')+' need attention · pauses expire after '+
-        d.pause_max_hours+'h' : 'All agents healthy · pauses expire after '+d.pause_max_hours+'h';
+      S.textContent = (bad ? bad+' agent'+(bad>1?'s need':' needs')+' attention' : 'All agents healthy')+
+        ' · pauses expire after '+d.pause_max_hours+'h';
     }).catch(function(e){ S.textContent='could not load agent state: '+e; });
   }
-  R.addEventListener('click', function(ev){
-    var b=ev.target.closest('button[data-agent]'); if(!b) return;
+  function onClick(ev){
+    var b=ev.target.closest && ev.target.closest('button[data-agent]'); if(!b) return;
     var agent=b.dataset.agent, action=b.dataset.action;
-    // Typed confirmation: a mis-tap on a phone must not pause the nightly or
-    // spend Postiz quota.
-    var typed=prompt('Type the agent name to '+action+':\n\n'+agent);
+    var typed=prompt('Type the agent name to '+action+':' + String.fromCharCode(10,10) + agent);
     if(typed!==agent){ if(typed!==null) alert('Name did not match — nothing changed.'); return; }
     b.disabled=true; b.textContent='…';
     fetch('/agent-control',{method:'POST',credentials:'same-origin',
@@ -796,7 +816,21 @@ const AGENT_PANEL_HTML = `
       .then(function(r){return r.json();})
       .then(function(d){ if(d.error||d.ok===false) alert(action+' failed: '+(d.error||d.detail)); load(); })
       .catch(function(e){ alert(action+' failed: '+e); load(); });
-  });
-  load(); setInterval(load, 60000);
+  }
+  function attach(){
+    if(document.getElementById('agent-panel')) return;
+    if(!document.body) return;
+    var host=document.createElement('div');
+    host.innerHTML=MARKUP;
+    var node=host.firstChild;
+    document.body.insertBefore(node, document.body.firstChild);
+    node.addEventListener('click', onClick);
+    load();
+  }
+  // The shell is a plain document we control, so one attach is enough.
+  if(document.readyState!=='loading') attach();
+  else document.addEventListener('DOMContentLoaded', attach);
+  setInterval(load, 60000);
 })();
 </script>`;
+
