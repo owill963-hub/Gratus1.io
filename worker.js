@@ -31,9 +31,19 @@ const FEED_KEY = "feed:current";
 // the two independent schedulers — Cloudflare cron and GitHub Actions — can
 // watch each other. A silent death is otherwise indistinguishable from a quiet
 // night: the board would keep serving the last-good feed forever with no signal.
-const HEARTBEAT_KEY = "agents:heartbeats";
-const HISTORY_KEY = "agents:history";     // capped run log per agent, 7 days
-const CONTROL_KEY = "agents:controls";    // pause / acknowledge state
+// (the KV blob is now HEARTBEAT_LEGACY; env.HEARTBEAT_KEY is the bearer secret —
+//  same name, different thing, so the constant is gone to avoid the confusion)
+// Per-agent keys, not one blob. Three writers — the nightly job, the monitor
+// worker and this worker's own cron — were doing read-modify-write on a single
+// KV key, and KV is eventually consistent: each writer read a stale copy and
+// wrote back, silently dropping the others. It showed up in production as an
+// agent with a last run but no history, beside one with history but no last
+// run. Separate keys mean writers never contend.
+const beatKey = (a) => `agents:beat:${a}`;
+const histKey = (a) => `agents:hist:${a}`;
+const HISTORY_KEY = "agents:history";     // legacy blob, read for migration only
+const HEARTBEAT_LEGACY = "agents:heartbeats";
+const CONTROL_KEY = "agents:controls";    // pause / acknowledge state (single writer: the panel)
 const HISTORY_DAYS = 7;
 const HISTORY_MAX = 200;                  // per agent, whichever bound hits first
 const PAUSE_MAX_MS = 4 * 3600 * 1000;     // a pause is a deliberate outage: it expires
@@ -518,34 +528,21 @@ async function agentHeartbeat(request, env) {
     (await sha256Hex(presented)) === (await sha256Hex(env.HEARTBEAT_KEY));
   if (!ok) return json({ error: "unauthorized" }, 401);
 
-  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+  const beats = {};
+  for (const name of Object.keys(HEARTBEAT_STALE_MIN)) {
+    beats[name] = (await readKvJson(env, beatKey(name)))
+      || ((await readKvJson(env, HEARTBEAT_LEGACY)) || {})[name] || null;
+  }
 
   if (request.method === "POST") {
     let body = {};
     try { body = await request.json(); } catch { /* tolerate an empty ping */ }
     const agent = String(body.agent || "").slice(0, 40);
     if (!agent) return json({ error: "agent is required" }, 400);
-    const entry = {
-      at: new Date().toISOString(),
-      status: String(body.status || "ok").slice(0, 20),
-      detail: String(body.detail || "").slice(0, 300),
-    };
-    beats[agent] = entry;
-
-    // Keep a capped run log as well as the latest beat. Without history there is
-    // no last-success distinct from last-run — a failure overwrites the last
-    // good run — and no error count at all.
-    const hist = (await readKvJson(env, HISTORY_KEY)) || {};
-    const cutoff = Date.now() - HISTORY_DAYS * 86400000;
-    const runs = [entry, ...(hist[agent] || [])]
-      .filter((r) => Date.parse(r.at) > cutoff)
-      .slice(0, HISTORY_MAX);
-    hist[agent] = runs;
-
-    if (env.FEED_KV) {
-      await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
-      await env.FEED_KV.put(HISTORY_KEY, JSON.stringify(hist));
-    }
+    await recordBeat(agent,
+      String(body.status || "ok").slice(0, 20),
+      String(body.detail || "").slice(0, 300), env);
+    beats[agent] = await readKvJson(env, beatKey(agent));
   }
 
   const feed = await readKvJson(env, FEED_KEY);
@@ -603,16 +600,26 @@ function alertSignature(beat) {
   return `${beat.status}|${(beat.detail || "").slice(0, 120)}`;
 }
 
+async function readAgent(agent, env) {
+  // Prefer the per-agent keys; fall back to the legacy blobs so the panel keeps
+  // working for agents that have not reported since the split.
+  const beat = (await readKvJson(env, beatKey(agent)))
+    || ((await readKvJson(env, HEARTBEAT_LEGACY)) || {})[agent] || null;
+  const runs = (await readKvJson(env, histKey(agent)))
+    || ((await readKvJson(env, HISTORY_KEY)) || {})[agent] || [];
+  return { beat, runs };
+}
+
 async function panelState(env) {
-  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
-  const hist = (await readKvJson(env, HISTORY_KEY)) || {};
   const ctrl = (await readKvJson(env, CONTROL_KEY)) || {};
+  const loaded = {};
+  for (const name of Object.keys(AGENT_LABELS)) loaded[name] = await readAgent(name, env);
   const now = Date.now();
   const day = now - 86400000;
 
   const agents = Object.keys(AGENT_LABELS).map((name) => {
-    const beat = beats[name] || null;
-    const runs = hist[name] || [];
+    const beat = loaded[name].beat;
+    const runs = loaded[name].runs;
     const lastSuccess = runs.find((r) => r.status === "ok") || null;
     const c = ctrl[name] || {};
     const pausedUntil = c.paused_until && Date.parse(c.paused_until) > now ? c.paused_until : null;
@@ -638,7 +645,9 @@ async function panelState(env) {
       paused_until: pausedUntil,
       acknowledged: !!acked,
       // Healthy means: reported recently, last run ok, not paused.
-      healthy: !overdue && beat && beat.status === "ok" && !pausedUntil,
+      // Coerce: `beat &&` yields null when there is no beat, and the panel then
+      // renders neither healthy nor unhealthy.
+      healthy: !!(!overdue && beat && beat.status === "ok" && !pausedUntil),
     };
   });
 
@@ -674,7 +683,11 @@ async function agentControl(request, env) {
   } else if (action === "resume") {
     cur.paused_until = null;
   } else if (action === "ack") {
-    const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+    const beats = {};
+  for (const name of Object.keys(HEARTBEAT_STALE_MIN)) {
+    beats[name] = (await readKvJson(env, beatKey(name)))
+      || ((await readKvJson(env, HEARTBEAT_LEGACY)) || {})[name] || null;
+  }
     cur.ack = { sig: alertSignature(beats[agent]), at: new Date().toISOString() };
   } else if (action === "rerun") {
     const out = await rerunAgent(agent, env);
@@ -724,15 +737,14 @@ async function isPaused(agent, env) {
 async function recordBeat(agent, status, detail, env) {
   if (!env.FEED_KV) return;
   const entry = { at: new Date().toISOString(), status, detail: String(detail).slice(0, 300) };
-  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
-  beats[agent] = entry;
-  const hist = (await readKvJson(env, HISTORY_KEY)) || {};
+  // Only this agent's own keys are touched, so concurrent agents cannot clobber
+  // one another the way they did with a shared blob.
+  const prior = (await readKvJson(env, histKey(agent)))
+    || ((await readKvJson(env, HISTORY_KEY)) || {})[agent] || [];
   const cutoff = Date.now() - HISTORY_DAYS * 86400000;
-  hist[agent] = [entry, ...(hist[agent] || [])]
-    .filter((r) => Date.parse(r.at) > cutoff)
-    .slice(0, HISTORY_MAX);
-  await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
-  await env.FEED_KV.put(HISTORY_KEY, JSON.stringify(hist));
+  const runs = [entry, ...prior].filter((r) => Date.parse(r.at) > cutoff).slice(0, HISTORY_MAX);
+  await env.FEED_KV.put(beatKey(agent), JSON.stringify(entry));
+  await env.FEED_KV.put(histKey(agent), JSON.stringify(runs));
 }
 
 // ── Control panel markup, injected into /status-board ────────────────────────
