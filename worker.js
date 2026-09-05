@@ -23,7 +23,8 @@ const PAGE_ROUTES = {
 // Private paths — only reachable with the access key / auth cookie.
 // Gate both the clean route AND the raw filename so the file can't be
 // reached directly, un-gated.
-const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json"];
+const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json",
+                   "/agents.json", "/agent-control"];
 const DASH_COOKIE = "g1_dash";
 const FEED_KEY = "feed:current";
 // Agent heartbeats. Each scheduled agent posts here after a successful run, so
@@ -31,6 +32,11 @@ const FEED_KEY = "feed:current";
 // watch each other. A silent death is otherwise indistinguishable from a quiet
 // night: the board would keep serving the last-good feed forever with no signal.
 const HEARTBEAT_KEY = "agents:heartbeats";
+const HISTORY_KEY = "agents:history";     // capped run log per agent, 7 days
+const CONTROL_KEY = "agents:controls";    // pause / acknowledge state
+const HISTORY_DAYS = 7;
+const HISTORY_MAX = 200;                  // per agent, whichever bound hits first
+const PAUSE_MAX_MS = 4 * 3600 * 1000;     // a pause is a deliberate outage: it expires
 const HEARTBEAT_STALE_MIN = { "nightly-ops": 26 * 60, "postiz-monitor": 90 }; // KV key holding the live status-board feed
 
 // Legacy pages → their new canonical URLs (301 so search engines transfer rank)
@@ -90,6 +96,11 @@ export default {
       if (gate) return gate;
     }
 
+    // Agent control panel data and actions. Both sit behind the dashboard gate
+    // above — same session, no second credential to carry on a phone.
+    if (cleanPath === "/agents.json") return agentsPanel(request, env);
+    if (cleanPath === "/agent-control") return agentControl(request, env);
+
     // Serve the live status-board feed from KV (static feed.json is the seed/fallback).
     // Gate above has already authenticated the request for this path.
     if (cleanPath === "/feed.json") {
@@ -105,7 +116,16 @@ export default {
     if (PAGE_ROUTES[cleanPath]) {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = PAGE_ROUTES[cleanPath];
-      return env.ASSETS.fetch(new Request(assetUrl, request));
+      const assetResp = await env.ASSETS.fetch(new Request(assetUrl, request));
+      // The status board is a design-tool export; a re-export would clobber
+      // anything written into it. The agent panel is injected here instead, so
+      // it lives in code and survives the next export.
+      if (cleanPath === "/status-board") {
+        return new HTMLRewriter()
+          .on("body", new AgentPanelInjector())
+          .transform(assetResp);
+      }
+      return assetResp;
     }
 
     // Redirect direct hits on the raw .dc.html filenames to their clean URLs
@@ -126,9 +146,19 @@ export default {
     return env.ASSETS.fetch(request);
   },
 
-  // Cron (*/30 * * * *) — regenerate the feed and cache it in KV.
+  // Cron (*/30 * * * *) — regenerate the feed and cache it in KV, unless this
+  // agent is paused from the control panel. Records its own heartbeat locally;
+  // no HTTP round-trip needed for an agent living in this worker.
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(refreshFeed(env));
+    ctx.waitUntil((async () => {
+      if (await isPaused("gratus1-feed", env)) {
+        await recordBeat("gratus1-feed", "paused", "skipped: paused from control panel", env);
+        return;
+      }
+      const feed = await refreshFeed(env);
+      await recordBeat("gratus1-feed", feed ? "ok" : "failed",
+                       feed ? "feed rebuilt" : "refresh returned null", env);
+    })());
   },
 };
 
@@ -484,18 +514,41 @@ async function agentHeartbeat(request, env) {
     try { body = await request.json(); } catch { /* tolerate an empty ping */ }
     const agent = String(body.agent || "").slice(0, 40);
     if (!agent) return json({ error: "agent is required" }, 400);
-    beats[agent] = {
+    const entry = {
       at: new Date().toISOString(),
       status: String(body.status || "ok").slice(0, 20),
       detail: String(body.detail || "").slice(0, 300),
     };
-    if (env.FEED_KV) await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
+    beats[agent] = entry;
+
+    // Keep a capped run log as well as the latest beat. Without history there is
+    // no last-success distinct from last-run — a failure overwrites the last
+    // good run — and no error count at all.
+    const hist = (await readKvJson(env, HISTORY_KEY)) || {};
+    const cutoff = Date.now() - HISTORY_DAYS * 86400000;
+    const runs = [entry, ...(hist[agent] || [])]
+      .filter((r) => Date.parse(r.at) > cutoff)
+      .slice(0, HISTORY_MAX);
+    hist[agent] = runs;
+
+    if (env.FEED_KV) {
+      await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
+      await env.FEED_KV.put(HISTORY_KEY, JSON.stringify(hist));
+    }
   }
 
   const feed = await readKvJson(env, FEED_KEY);
   const feedAt = feed && feed.generatedAt ? Date.parse(feed.generatedAt) : null;
+  const ctrl = (await readKvJson(env, CONTROL_KEY)) || {};
+  const paused = {};
+  for (const [name, c] of Object.entries(ctrl)) {
+    if (c && c.paused_until && Date.parse(c.paused_until) > Date.now()) {
+      paused[name] = c.paused_until;
+    }
+  }
   return json({
     ok: true,
+    paused,
     feed_generated_at: feed && feed.generatedAt ? feed.generatedAt : null,
     feed_age_minutes: feedAt ? Math.round((Date.now() - feedAt) / 60000) : null,
     heartbeats: beats,
@@ -516,3 +569,234 @@ function staleAgents(beats) {
   }
   return out;
 }
+
+// ── Agent control panel ──────────────────────────────────────────────────────
+const AGENT_LABELS = {
+  "nightly-ops": "Nightly ops (GitHub Actions, 02:00Z)",
+  "postiz-monitor": "Postiz monitor (Worker, every 30 min)",
+  "gratus1-feed": "Status-board feed (Worker, every 30 min)",
+};
+
+function jsonResp(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  });
+}
+
+// An acknowledgement is bound to the state it was made against, so it clears
+// itself the moment something different goes wrong rather than muting the next
+// real incident.
+function alertSignature(beat) {
+  if (!beat) return "none";
+  return `${beat.status}|${(beat.detail || "").slice(0, 120)}`;
+}
+
+async function panelState(env) {
+  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+  const hist = (await readKvJson(env, HISTORY_KEY)) || {};
+  const ctrl = (await readKvJson(env, CONTROL_KEY)) || {};
+  const now = Date.now();
+  const day = now - 86400000;
+
+  const agents = Object.keys(AGENT_LABELS).map((name) => {
+    const beat = beats[name] || null;
+    const runs = hist[name] || [];
+    const lastSuccess = runs.find((r) => r.status === "ok") || null;
+    const c = ctrl[name] || {};
+    const pausedUntil = c.paused_until && Date.parse(c.paused_until) > now ? c.paused_until : null;
+    const sig = alertSignature(beat);
+    const acked = c.ack && c.ack.sig === sig;
+    const limit = HEARTBEAT_STALE_MIN[name];
+    const ageMin = beat ? Math.round((now - Date.parse(beat.at)) / 60000) : null;
+    const overdue = limit != null && (ageMin == null || ageMin > limit);
+
+    return {
+      agent: name,
+      label: AGENT_LABELS[name],
+      last_run: beat ? beat.at : null,
+      last_run_status: beat ? beat.status : null,
+      last_run_detail: beat ? beat.detail : "",
+      last_run_age_min: ageMin,
+      last_success: lastSuccess ? lastSuccess.at : null,
+      errors_24h: runs.filter((r) => r.status !== "ok" && Date.parse(r.at) > day).length,
+      errors_7d: runs.filter((r) => r.status !== "ok").length,
+      runs_7d: runs.length,
+      stale_limit_min: limit ?? null,
+      overdue,
+      paused_until: pausedUntil,
+      acknowledged: !!acked,
+      // Healthy means: reported recently, last run ok, not paused.
+      healthy: !overdue && beat && beat.status === "ok" && !pausedUntil,
+    };
+  });
+
+  return { generated_at: new Date().toISOString(), pause_max_hours: PAUSE_MAX_MS / 3600000, agents };
+}
+
+async function agentsPanel(request, env) {
+  return jsonResp(await panelState(env));
+}
+
+async function agentControl(request, env) {
+  if (request.method !== "POST") return jsonResp({ error: "POST required" }, 405);
+  let body = {};
+  try { body = await request.json(); } catch { /* handled below */ }
+
+  const agent = String(body.agent || "");
+  const action = String(body.action || "");
+  if (!AGENT_LABELS[agent]) return jsonResp({ error: "unknown agent" }, 400);
+
+  // Typed confirmation: the caller must echo the agent name. Cheap, and it stops
+  // a mis-tap on a phone pausing the nightly or spending Postiz quota.
+  if (String(body.confirm || "") !== agent) {
+    return jsonResp({ error: `confirm must equal "${agent}"` }, 400);
+  }
+
+  const ctrl = (await readKvJson(env, CONTROL_KEY)) || {};
+  const cur = ctrl[agent] || {};
+
+  if (action === "pause") {
+    // Clamped, never open-ended. A forgotten pause is a silent outage.
+    const hours = Math.min(Number(body.hours) || 4, PAUSE_MAX_MS / 3600000);
+    cur.paused_until = new Date(Date.now() + hours * 3600000).toISOString();
+  } else if (action === "resume") {
+    cur.paused_until = null;
+  } else if (action === "ack") {
+    const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+    cur.ack = { sig: alertSignature(beats[agent]), at: new Date().toISOString() };
+  } else if (action === "rerun") {
+    const out = await rerunAgent(agent, env);
+    return jsonResp({ ok: out.ok, action, agent, detail: out.detail });
+  } else {
+    return jsonResp({ error: "action must be pause, resume, ack or rerun" }, 400);
+  }
+
+  ctrl[agent] = cur;
+  if (env.FEED_KV) await env.FEED_KV.put(CONTROL_KEY, JSON.stringify(ctrl));
+  return jsonResp({ ok: true, action, agent, state: cur });
+}
+
+async function rerunAgent(agent, env) {
+  if (agent === "gratus1-feed") {
+    const feed = await refreshFeed(env);
+    return { ok: !!feed, detail: feed ? "feed rebuilt" : "refresh failed" };
+  }
+  if (agent === "postiz-monitor") {
+    if (!env.MONITOR_URL || !env.MONITOR_TOKEN) {
+      return { ok: false, detail: "MONITOR_URL / MONITOR_TOKEN not configured on this worker" };
+    }
+    try {
+      const r = await fetch(`${env.MONITOR_URL}/run`, {
+        headers: { Authorization: `Bearer ${env.MONITOR_TOKEN}` },
+      });
+      return { ok: r.ok, detail: `monitor responded ${r.status}` };
+    } catch (e) {
+      return { ok: false, detail: String((e && e.message) || e) };
+    }
+  }
+  if (agent === "nightly-ops") {
+    // Triggering a GitHub Actions workflow needs a repo-scoped token this worker
+    // does not hold. Say so plainly rather than pretending the button worked.
+    return { ok: false, detail: "not wired: needs a GitHub token with workflow scope" };
+  }
+  return { ok: false, detail: "no rerun path for this agent" };
+}
+
+// Shared by the in-worker agent and the /agent-heartbeat intake.
+async function isPaused(agent, env) {
+  const ctrl = (await readKvJson(env, CONTROL_KEY)) || {};
+  const until = ctrl[agent] && ctrl[agent].paused_until;
+  return !!(until && Date.parse(until) > Date.now());
+}
+
+async function recordBeat(agent, status, detail, env) {
+  if (!env.FEED_KV) return;
+  const entry = { at: new Date().toISOString(), status, detail: String(detail).slice(0, 300) };
+  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+  beats[agent] = entry;
+  const hist = (await readKvJson(env, HISTORY_KEY)) || {};
+  const cutoff = Date.now() - HISTORY_DAYS * 86400000;
+  hist[agent] = [entry, ...(hist[agent] || [])]
+    .filter((r) => Date.parse(r.at) > cutoff)
+    .slice(0, HISTORY_MAX);
+  await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
+  await env.FEED_KV.put(HISTORY_KEY, JSON.stringify(hist));
+}
+
+// ── Control panel markup, injected into /status-board ────────────────────────
+class AgentPanelInjector {
+  element(el) {
+    el.append(AGENT_PANEL_HTML, { html: true });
+  }
+}
+
+const AGENT_PANEL_HTML = `
+<section id="agent-panel" style="font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;max-width:1100px;margin:40px auto 64px;padding:0 20px;color:#e8e6f0;">
+  <h2 style="font-size:18px;letter-spacing:.02em;margin:0 0 4px;">Agents</h2>
+  <p id="ap-sub" style="margin:0 0 18px;font-size:13px;opacity:.6;">loading…</p>
+  <div id="ap-rows" style="display:grid;gap:10px;"></div>
+</section>
+<script>
+(function(){
+  var R=document.getElementById('ap-rows'), S=document.getElementById('ap-sub');
+  function ago(iso){ if(!iso) return 'never';
+    var m=Math.round((Date.now()-Date.parse(iso))/60000);
+    if(m<60) return m+'m ago'; var h=Math.round(m/60);
+    return h<48 ? h+'h ago' : Math.round(h/24)+'d ago'; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function card(a){
+    var colour = a.paused_until ? '#e0b968' : (a.healthy ? '#6fcf7a' : '#e05b5b');
+    var state  = a.paused_until ? 'PAUSED until '+new Date(a.paused_until).toLocaleTimeString()
+               : (a.healthy ? 'healthy' : (a.overdue ? 'OVERDUE' : 'last run '+esc(a.last_run_status)));
+    return '<div style="border:1px solid rgba(255,255,255,.12);border-left:3px solid '+colour+
+      ';border-radius:10px;padding:14px 16px;background:rgba(255,255,255,.03);">'+
+      '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;">'+
+        '<strong style="font-size:14px;">'+esc(a.label)+'</strong>'+
+        '<span style="font-size:12px;color:'+colour+';font-weight:600;">'+esc(state)+
+        (a.acknowledged?' · ack\'d':'')+'</span></div>'+
+      '<div style="margin-top:8px;font-size:12px;opacity:.75;display:flex;gap:18px;flex-wrap:wrap;">'+
+        '<span>last run '+ago(a.last_run)+'</span>'+
+        '<span>last success '+ago(a.last_success)+'</span>'+
+        '<span>errors 24h <b>'+a.errors_24h+'</b></span>'+
+        '<span>errors 7d <b>'+a.errors_7d+'</b></span>'+
+        '<span>'+a.runs_7d+' runs/7d</span></div>'+
+      (a.last_run_detail?'<div style="margin-top:6px;font-size:12px;opacity:.55;">'+esc(a.last_run_detail)+'</div>':'')+
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">'+
+        btn(a.agent,'rerun','Re-run')+
+        (a.paused_until?btn(a.agent,'resume','Resume'):btn(a.agent,'pause','Pause 4h'))+
+        (a.healthy?'':btn(a.agent,'ack','Acknowledge'))+
+      '</div></div>';
+  }
+  function btn(agent,action,label){
+    return '<button data-agent="'+esc(agent)+'" data-action="'+action+'" '+
+      'style="font:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;'+
+      'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e8e6f0;">'+label+'</button>';
+  }
+  function load(){
+    fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
+      R.innerHTML = d.agents.map(card).join('');
+      var bad = d.agents.filter(function(a){return !a.healthy && !a.paused_until;}).length;
+      S.textContent = bad ? bad+' agent'+(bad>1?'s':'')+' need attention · pauses expire after '+
+        d.pause_max_hours+'h' : 'All agents healthy · pauses expire after '+d.pause_max_hours+'h';
+    }).catch(function(e){ S.textContent='could not load agent state: '+e; });
+  }
+  R.addEventListener('click', function(ev){
+    var b=ev.target.closest('button[data-agent]'); if(!b) return;
+    var agent=b.dataset.agent, action=b.dataset.action;
+    // Typed confirmation: a mis-tap on a phone must not pause the nightly or
+    // spend Postiz quota.
+    var typed=prompt('Type the agent name to '+action+':\n\n'+agent);
+    if(typed!==agent){ if(typed!==null) alert('Name did not match — nothing changed.'); return; }
+    b.disabled=true; b.textContent='…';
+    fetch('/agent-control',{method:'POST',credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({agent:agent,action:action,confirm:agent})})
+      .then(function(r){return r.json();})
+      .then(function(d){ if(d.error||d.ok===false) alert(action+' failed: '+(d.error||d.detail)); load(); })
+      .catch(function(e){ alert(action+' failed: '+e); load(); });
+  });
+  load(); setInterval(load, 60000);
+})();
+</script>`;
