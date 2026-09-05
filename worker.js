@@ -539,9 +539,14 @@ async function agentHeartbeat(request, env) {
     try { body = await request.json(); } catch { /* tolerate an empty ping */ }
     const agent = String(body.agent || "").slice(0, 40);
     if (!agent) return json({ error: "agent is required" }, 400);
+    // `extra` carries structured checks the reporting agent already computed —
+    // redirector slugs, per-platform delivery health. Passing them here means
+    // the panel shows them without making its own API calls, and without a
+    // second store to keep in sync.
     await recordBeat(agent,
       String(body.status || "ok").slice(0, 20),
-      String(body.detail || "").slice(0, 300), env);
+      String(body.detail || "").slice(0, 300), env,
+      body.extra && typeof body.extra === "object" ? body.extra : null);
     beats[agent] = await readKvJson(env, beatKey(agent));
   }
 
@@ -651,7 +656,23 @@ async function panelState(env) {
     };
   });
 
-  return { generated_at: new Date().toISOString(), pause_max_hours: PAUSE_MAX_MS / 3600000, agents };
+  // The nightly job is the only agent that computes these, so they hang off the
+  // panel rather than off an agent card.
+  const nightly = loaded["nightly-ops"] && loaded["nightly-ops"].beat;
+  const extra = (nightly && nightly.extra) || {};
+
+  return {
+    generated_at: new Date().toISOString(),
+    pause_max_hours: PAUSE_MAX_MS / 3600000,
+    agents,
+    redirector: extra.redirector || null,
+    platforms: extra.platforms || null,
+    credentials: extra.credentials || null,
+    scheduled_by_day: extra.scheduled_by_day || null,
+    published_by_day: extra.published_by_day || null,
+    totals: extra.totals || null,
+    checks_at: nightly ? nightly.at : null,
+  };
 }
 
 async function agentsPanel(request, env) {
@@ -766,9 +787,10 @@ async function isPaused(agent, env) {
   return !!(until && Date.parse(until) > Date.now());
 }
 
-async function recordBeat(agent, status, detail, env) {
+async function recordBeat(agent, status, detail, env, extra) {
   if (!env.FEED_KV) return;
   const entry = { at: new Date().toISOString(), status, detail: String(detail).slice(0, 300) };
+  if (extra) entry.extra = extra;
   // Only this agent's own keys are touched, so concurrent agents cannot clobber
   // one another the way they did with a shared blob.
   const prior = (await readKvJson(env, histKey(agent)))
@@ -793,67 +815,205 @@ function statusBoardShell() {
 
 
 const AGENT_PANEL_BOOT = `
+<style>
+  #ap-hud{--cy:#29b6f6;--cy2:#4fc3f7;--mag:#e0509a;--pur:#7e57c2;--ink:#cfe6ff;--dim:#7f9dbd;
+    --panel:rgba(9,20,38,.78);--line:rgba(41,182,246,.28);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+    background:radial-gradient(1200px 600px at 50% -10%,#0d2340 0%,#050b17 60%,#03070f 100%);
+    padding:18px clamp(12px,2vw,26px) 26px;}
+  #ap-hud h1{margin:0;text-align:center;font-size:clamp(18px,2.4vw,30px);letter-spacing:.06em;
+    color:var(--cy2);text-shadow:0 0 18px rgba(41,182,246,.55);font-weight:700;}
+  #ap-hud .rule{display:flex;align-items:center;gap:10px;margin:8px 0 16px;}
+  #ap-hud .rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);}
+  #ap-hud .rule b{width:8px;height:8px;transform:rotate(45deg);background:var(--cy);box-shadow:0 0 10px var(--cy);}
+  #ap-hud .grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr);}
+  #ap-hud .p{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+    backdrop-filter:blur(3px);}
+  #ap-hud .p h2{margin:0 0 12px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--cy2);}
+  #ap-hud .s6{grid-column:span 6;} #ap-hud .s4{grid-column:span 4;} #ap-hud .s12{grid-column:span 12;}
+  @media(max-width:900px){#ap-hud .s6,#ap-hud .s4{grid-column:span 12;}}
+  #ap-hud .bar-row{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:8px;margin:7px 0;font-size:12px;}
+  #ap-hud .bar{height:14px;border-radius:3px;background:linear-gradient(90deg,var(--cy),var(--cy2));
+    box-shadow:0 0 10px rgba(41,182,246,.45);}
+  #ap-hud .track{height:8px;border-radius:6px;background:rgba(255,255,255,.12);position:relative;}
+  #ap-hud .fill{height:8px;border-radius:6px;background:linear-gradient(90deg,var(--cy),var(--pur));}
+  #ap-hud .knob{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:#fff;
+    box-shadow:0 0 8px rgba(255,255,255,.8);transform:translateX(-7px);}
+  #ap-hud .slab{margin:12px 0;font-size:12px;}
+  #ap-hud .slab .lab{text-align:right;color:var(--cy2);margin-bottom:5px;font-weight:600;}
+  #ap-hud .cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+  #ap-hud .card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-left-width:3px;
+    border-radius:8px;padding:12px 14px;}
+  #ap-hud .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin-top:6px;}
+  #ap-hud button{font:inherit;font-size:11px;padding:5px 11px;border-radius:5px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(41,182,246,.10);color:var(--ink);}
+  #ap-hud button:hover{background:rgba(41,182,246,.22);}
+  #ap-hud .kv{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;}
+</style>
 <script>
 (function(){
-  var MARKUP =
-    '<section id="agent-panel" style="font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;' +
-    'max-width:1100px;margin:32px auto 56px;padding:20px;color:#e8e6f0;background:#12101c;' +
-    'border:1px solid rgba(255,255,255,.12);border-radius:14px;">' +
-      '<h2 style="font-size:17px;margin:0 0 4px;">Agents</h2>' +
-      '<p id="ap-sub" style="margin:0 0 16px;font-size:13px;opacity:.6;">loading…</p>' +
-      '<div id="ap-rows" style="display:grid;gap:10px;"></div>' +
-    '</section>';
+  var C={cy:'#29b6f6',cy2:'#4fc3f7',mag:'#e0509a',pur:'#7e57c2',bad:'#ff5c7a',ok:'#43d67c'};
+  var PAL=[C.cy,C.mag,C.pur,'#26c6da','#ab47bc'];
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function ago(iso){if(!iso)return 'never';var m=Math.round((Date.now()-Date.parse(iso))/60000);
+    if(m<60)return m+'m';var h=Math.round(m/60);return h<48?h+'h':Math.round(h/24)+'d';}
+  function pct(n,d){return d>0?Math.round(n/d*100):0;}
 
-  function ago(iso){ if(!iso) return 'never';
-    var m=Math.round((Date.now()-Date.parse(iso))/60000);
-    if(m<60) return m+'m ago'; var h=Math.round(m/60);
-    return h<48 ? h+'h ago' : Math.round(h/24)+'d ago'; }
-  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-  function btn(agent,action,label){
-    return '<button data-agent="'+esc(agent)+'" data-action="'+action+'" '+
-      'style="font:inherit;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;'+
-      'border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e8e6f0;">'+label+'</button>';
+  function hbars(rows){                       // capacity-style horizontal bars
+    if(!rows.length) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
+    var max=Math.max.apply(null,rows.map(function(r){return r[1];}))||1;
+    return rows.map(function(r){
+      return '<div class="bar-row"><span style="color:var(--dim);text-align:right">'+esc(r[0])+
+        '</span><div class="bar" style="width:'+Math.max(3,r[1]/max*100)+'%"></div>'+
+        '<b style="color:var(--cy2)">'+r[1]+'</b></div>';
+    }).join('');
   }
-  function card(a){
-    var colour = a.paused_until ? '#e0b968' : (a.healthy ? '#6fcf7a' : '#e05b5b');
-    var state  = a.paused_until ? 'PAUSED until '+new Date(a.paused_until).toLocaleTimeString()
-               : (a.healthy ? 'healthy' : (a.overdue ? 'OVERDUE' : 'last run '+esc(a.last_run_status)));
-    return '<div style="border:1px solid rgba(255,255,255,.12);border-left:3px solid '+colour+
-      ';border-radius:10px;padding:14px 16px;background:rgba(255,255,255,.03);">'+
-      '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;">'+
-        '<strong style="font-size:14px;">'+esc(a.label)+'</strong>'+
-        '<span style="font-size:12px;color:'+colour+';font-weight:600;">'+esc(state)+
-        (a.acknowledged?' · acknowledged':'')+'</span></div>'+
-      '<div style="margin-top:8px;font-size:12px;opacity:.75;display:flex;gap:18px;flex-wrap:wrap;">'+
-        '<span>last run '+ago(a.last_run)+'</span>'+
-        '<span>last success '+ago(a.last_success)+'</span>'+
-        '<span>errors 24h <b>'+a.errors_24h+'</b></span>'+
-        '<span>errors 7d <b>'+a.errors_7d+'</b></span>'+
-        '<span>'+a.runs_7d+' runs/7d</span></div>'+
-      (a.last_run_detail?'<div style="margin-top:6px;font-size:12px;opacity:.55;">'+esc(a.last_run_detail)+'</div>':'')+
-      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">'+
-        btn(a.agent,'rerun','Re-run')+
-        (a.paused_until?btn(a.agent,'resume','Resume'):btn(a.agent,'pause','Pause 4h'))+
-        (a.healthy?'':btn(a.agent,'ack','Acknowledge'))+
-      '</div></div>';
+  function sliders(rows){                     // task-completion-style sliders
+    return rows.map(function(r){
+      var v=Math.max(0,Math.min(100,r[1]));
+      return '<div class="slab"><div class="lab">'+esc(r[0])+': '+v+'%</div>'+
+        '<div class="track"><div class="fill" style="width:'+v+'%"></div>'+
+        '<div class="knob" style="left:'+v+'%"></div></div></div>';
+    }).join('');
   }
+  function donut(rows){                       // source-of-power-style donut
+    var tot=rows.reduce(function(a,r){return a+r[1];},0);
+    if(!tot) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
+    var cx=95,cy=95,r=62,w=22,a=-Math.PI/2,out='',legend='';
+    rows.forEach(function(row,i){
+      var frac=row[1]/tot, a2=a+frac*Math.PI*2, large=frac>0.5?1:0;
+      var x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+      out+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+'" fill="none" stroke="'+
+        PAL[i%PAL.length]+'" stroke-width="'+w+'"/>';
+      legend+='<div class="kv"><span style="color:'+PAL[i%PAL.length]+'">'+esc(row[0])+'</span>'+
+        '<span>'+(frac*100).toFixed(1)+'%</span></div>';
+      a=a2;
+    });
+    return '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">'+
+      '<svg viewBox="0 0 190 190" style="width:150px;height:150px;flex:none">'+out+
+      '<text x="95" y="90" text-anchor="middle" fill="'+C.cy2+'" font-size="26" font-weight="700">'+tot+
+      '</text><text x="95" y="108" text-anchor="middle" fill="#7f9dbd" font-size="10">QUEUED</text></svg>'+
+      '<div style="flex:1;min-width:120px">'+legend+'</div></div>';
+  }
+  function area(series){                      // hourly-generation-style area chart
+    if(!series||series.length<2) return '<div style="opacity:.6;font-size:12px">not enough history yet</div>';
+    var W=560,H=150,pad=26;
+    var max=Math.max.apply(null,series.map(function(p){return p[1];}))||1;
+    var step=(W-pad*2)/(series.length-1);
+    var pts=series.map(function(p,i){return [pad+i*step, H-pad-(p[1]/max)*(H-pad*1.6)];});
+    var line=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ');
+    var fill=line+' L'+pts[pts.length-1][0].toFixed(1)+' '+(H-pad)+' L'+pad+' '+(H-pad)+' Z';
+    var ticks=series.map(function(p,i){
+      if(series.length>8 && i%Math.ceil(series.length/6)) return '';
+      return '<text x="'+(pad+i*step)+'" y="'+(H-8)+'" fill="#7f9dbd" font-size="9" text-anchor="middle">'+
+        p[0].slice(5)+'</text>';}).join('');
+    return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:150px">'+
+      '<defs><linearGradient id="apg" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="'+C.cy+'" stop-opacity=".55"/>'+
+      '<stop offset="100%" stop-color="'+C.cy+'" stop-opacity="0"/></linearGradient></defs>'+
+      '<path d="'+fill+'" fill="url(#apg)"/><path d="'+line+'" fill="none" stroke="'+C.cy2+
+      '" stroke-width="2"/><text x="4" y="14" fill="#7f9dbd" font-size="9">'+max+'</text>'+ticks+'</svg>';
+  }
+  function vbars(series){                     // accumulated-output-style vertical bars
+    if(!series||!series.length) return '<div style="opacity:.6;font-size:12px">no data yet</div>';
+    var run=0, cum=series.map(function(p){run+=p[1];return [p[0],run];});
+    var W=520,H=150,pad=26,max=cum[cum.length-1][1]||1;
+    var bw=(W-pad*2)/cum.length*0.62, step=(W-pad*2)/cum.length;
+    var bars=cum.map(function(p,i){
+      var h=(p[1]/max)*(H-pad*1.7), x=pad+i*step+(step-bw)/2, y=H-pad-h;
+      return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+
+        h.toFixed(1)+'" rx="2" fill="url(#apm)"/>'+
+        (cum.length>10 && i%3 ? '' :
+         '<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" fill="#7f9dbd" font-size="9" text-anchor="middle">'+
+         p[0].slice(5)+'</text>');
+    }).join('');
+    return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:150px">'+
+      '<defs><linearGradient id="apm" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="'+C.mag+'"/><stop offset="100%" stop-color="'+C.pur+
+      '" stop-opacity=".5"/></linearGradient></defs>'+
+      '<text x="4" y="14" fill="#7f9dbd" font-size="9">'+max+'</text>'+bars+'</svg>';
+  }
+  function agentCard(a){
+    var col=a.paused_until?'#e0b968':(a.healthy?C.ok:C.bad);
+    var st=a.paused_until?'PAUSED to '+new Date(a.paused_until).toLocaleTimeString():
+      (a.healthy?'HEALTHY':(a.overdue?'OVERDUE':'LAST RUN '+String(a.last_run_status||'?').toUpperCase()));
+    return '<div class="card" style="border-left-color:'+col+'">'+
+      '<div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">'+
+      '<strong style="font-size:12.5px">'+esc(a.label)+'</strong>'+
+      '<span style="font-size:10.5px;color:'+col+';font-weight:700;letter-spacing:.06em">'+esc(st)+'</span></div>'+
+      '<div class="meta"><span>run '+ago(a.last_run)+'</span><span>ok '+ago(a.last_success)+'</span>'+
+      '<span>err 24h '+a.errors_24h+'</span><span>err 7d '+a.errors_7d+'</span>'+
+      '<span>'+a.runs_7d+' runs/7d</span></div>'+
+      '<div style="margin-top:9px;display:flex;gap:7px;flex-wrap:wrap">'+
+      b(a.agent,'rerun','Re-run')+(a.paused_until?b(a.agent,'resume','Resume'):b(a.agent,'pause','Pause 4h'))+
+      (a.healthy?'':b(a.agent,'ack','Ack'))+'</div></div>';
+  }
+  function b(ag,ac,l){return '<button data-agent="'+esc(ag)+'" data-action="'+ac+'">'+l+'</button>';}
+
+  var SHELL='<div id="ap-hud">'+
+    '<h1>Gratus1 Operations Monitoring</h1>'+
+    '<div class="rule"><i></i><b></b><span id="ap-sub" style="font-size:11px;color:#7f9dbd;letter-spacing:.08em"></span><b></b><i></i></div>'+
+    '<div class="grid">'+
+      '<div class="p s6"><h2>Queued posts by platform</h2><div id="ap-cap"></div></div>'+
+      '<div class="p s6"><h2>Completion rate</h2><div id="ap-slid"></div></div>'+
+      '<div class="p s4"><h2>Queue share</h2><div id="ap-donut"></div></div>'+
+      '<div class="p s4"><h2>Scheduled volume per day</h2><div id="ap-area"></div></div>'+
+      '<div class="p s4"><h2>Cumulative scheduled</h2><div id="ap-vbar"></div></div>'+
+      '<div class="p s12"><h2>Agents</h2><div id="ap-rows" class="cards"></div></div>'+
+      '<div class="p s6"><h2>Redirector · link.gratus1.io</h2><div id="ap-redir"></div></div>'+
+      '<div class="p s6"><h2>Credentials</h2><div id="ap-cred"></div></div>'+
+    '</div></div>';
+
   function load(){
-    var R=document.getElementById('ap-rows'), S=document.getElementById('ap-sub');
-    if(!R) return;
+    var host=document.getElementById('ap-hud'); if(!host) return;
     fetch('/agents.json',{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
-      R.innerHTML = d.agents.map(card).join('');
-      var bad = d.agents.filter(function(a){return !a.healthy && !a.paused_until;}).length;
-      S.textContent = (bad ? bad+' agent'+(bad>1?'s need':' needs')+' attention' : 'All agents healthy')+
-        ' · pauses expire after '+d.pause_max_hours+'h';
-    }).catch(function(e){ S.textContent='could not load agent state: '+e; });
+      var P=d.platforms||{}, names=Object.keys(P);
+      var qrows=names.map(function(n){return [n,P[n].queued];}).sort(function(a,b){return b[1]-a[1];});
+      document.getElementById('ap-cap').innerHTML=hbars(qrows);
+      document.getElementById('ap-donut').innerHTML=donut(qrows);
+      document.getElementById('ap-area').innerHTML=area(d.scheduled_by_day||[]);
+      document.getElementById('ap-vbar').innerHTML=vbars(d.scheduled_by_day||[]);
+
+      var sl=d.agents.map(function(a){
+        return [a.label.split(' (')[0]+' success 7d', a.runs_7d? pct(a.runs_7d-a.errors_7d,a.runs_7d):100];});
+      if(d.redirector&&d.redirector.length){
+        var okc={301:1,302:1,307:1,308:1};
+        sl.push(['Redirector slugs live',
+          pct(d.redirector.filter(function(r){return okc[r.code];}).length, d.redirector.length)]);
+      }
+      var deliv=names.reduce(function(a,n){return a+P[n].overdue+P[n].no_release;},0);
+      var tot=names.reduce(function(a,n){return a+P[n].queued+P[n].published;},0);
+      if(tot) sl.push(['Delivery clean', pct(tot-deliv,tot)]);
+      if(d.credentials&&d.credentials.length){
+        sl.push(['PAT life remaining', Math.max(0,Math.min(100,Math.round(d.credentials[0].days_left/90*100)))]);
+      }
+      document.getElementById('ap-slid').innerHTML=sliders(sl);
+
+      document.getElementById('ap-rows').innerHTML=d.agents.map(agentCard).join('');
+      var okc2={301:1,302:1,307:1,308:1};
+      document.getElementById('ap-redir').innerHTML=(d.redirector||[]).map(function(r){
+        return '<div class="kv"><span>/'+esc(r.slug)+'</span><span style="color:'+
+          (okc2[r.code]?C.ok:C.bad)+'">'+esc(r.code)+'</span></div>';}).join('')||
+        '<div style="opacity:.6;font-size:12px">no data yet</div>';
+      document.getElementById('ap-cred').innerHTML=(d.credentials||[]).map(function(c){
+        return '<div class="kv"><span>'+esc(c.name)+'</span><span style="color:'+
+          (c.days_left<=14?C.bad:C.ok)+'">'+esc(c.expires)+' · '+c.days_left+'d</span></div>';}).join('')||
+        '<div style="opacity:.6;font-size:12px">no data yet</div>';
+
+      var bad=d.agents.filter(function(a){return !a.healthy&&!a.paused_until;}).length;
+      document.getElementById('ap-sub').textContent=
+        (bad?bad+' AGENT'+(bad>1?'S':'')+' NEED ATTENTION':'ALL SYSTEMS NOMINAL')+
+        ' · CHECKS '+(d.checks_at?ago(d.checks_at)+' AGO':'PENDING');
+    }).catch(function(e){
+      var sub=document.getElementById('ap-sub'); if(sub) sub.textContent='LOAD FAILED: '+e;});
   }
   function onClick(ev){
-    var b=ev.target.closest && ev.target.closest('button[data-agent]'); if(!b) return;
-    var agent=b.dataset.agent, action=b.dataset.action;
-    var typed=prompt('Type the agent name to '+action+':' + String.fromCharCode(10,10) + agent);
-    if(typed!==agent){ if(typed!==null) alert('Name did not match — nothing changed.'); return; }
-    b.disabled=true; b.textContent='…';
+    var t=ev.target.closest&&ev.target.closest('button[data-agent]'); if(!t) return;
+    var agent=t.dataset.agent, action=t.dataset.action;
+    var typed=prompt('Type the agent name to '+action+':'+String.fromCharCode(10,10)+agent);
+    if(typed!==agent){ if(typed!==null) alert('Name did not match - nothing changed.'); return; }
+    t.disabled=true; t.textContent='...';
     fetch('/agent-control',{method:'POST',credentials:'same-origin',
       headers:{'content-type':'application/json'},
       body:JSON.stringify({agent:agent,action:action,confirm:agent})})
@@ -862,19 +1022,14 @@ const AGENT_PANEL_BOOT = `
       .catch(function(e){ alert(action+' failed: '+e); load(); });
   }
   function attach(){
-    if(document.getElementById('agent-panel')) return;
-    if(!document.body) return;
-    var host=document.createElement('div');
-    host.innerHTML=MARKUP;
-    var node=host.firstChild;
-    document.body.insertBefore(node, document.body.firstChild);
-    node.addEventListener('click', onClick);
-    load();
+    if(document.getElementById('ap-hud')||!document.body) return;
+    var h=document.createElement('div'); h.innerHTML=SHELL;
+    var n=h.firstChild; document.body.insertBefore(n,document.body.firstChild);
+    n.addEventListener('click',onClick); load();
   }
-  // The shell is a plain document we control, so one attach is enough.
   if(document.readyState!=='loading') attach();
-  else document.addEventListener('DOMContentLoaded', attach);
-  setInterval(load, 60000);
+  else document.addEventListener('DOMContentLoaded',attach);
+  setInterval(load,60000);
 })();
 </script>`;
 
