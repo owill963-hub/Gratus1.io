@@ -57,6 +57,42 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script src="./support.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "My Tech Buddy",
+      "url": "https://gratus1.io/my-tech-buddy",
+      "applicationCategory": "MobileApplication",
+      "operatingSystem": "iOS 15.0 or later",
+      "softwareVersion": "1.1",
+      "datePublished": "2026-07-24",
+      "description": "Plain-language help with home technology: identify a device from a photo, connect things, ask questions, diagnose problems.",
+      "installUrl": "https://apps.apple.com/us/app/my-tech-buddy/id6771501862",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "O Williams Consulting LLC",
+        "url": "https://gratus1.io"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "name": "My Tech Buddy walkthrough",
+      "description": "Identify, Connect, Ask, Diagnose and Library, recorded on device.",
+      "uploadDate": "2026-09-05",
+      "thumbnailUrl": "https://gratus1.io/media/my-tech-buddy-demo.jpg",
+      "contentUrl": "https://gratus1.io/media/my-tech-buddy-demo.mp4"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <x-dc>
@@ -94,6 +130,7 @@
       <span style="font-weight:600;font-size:15px;letter-spacing:.02em;">My Tech Buddy</span>
     </a>
     <div style="display:flex;align-items:center;gap:clamp(16px,3vw,36px);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;">
+      <a href="#whats-new" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">What&rsquo;s new</a>
       <a href="#features" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">Features</a>
       <a href="#how" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">How it works</a>
       <a href="#support" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--blue);">Support</a>
@@ -176,6 +213,44 @@
         <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:40px;color:var(--green);line-height:1;">03</div>
         <h4 style="margin-top:18px;font-weight:600;font-size:19px;">Do</h4>
         <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Follow simple steps and solve it with confidence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW -->
+  <section id="whats-new" style="position:relative;z-index:10;padding:clamp(70px,9vh,130px) clamp(24px,6vw,80px);border-top:1px solid var(--line);">
+    <div data-reveal style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;color:var(--blue);text-transform:uppercase;"><span style="width:26px;height:1px;background:var(--blue);"></span>// Version 1.1 &nbsp;·&nbsp; 24 July 2026</div>
+    <h2 data-reveal data-delay="0.05" style="margin-top:20px;font-weight:700;font-size:clamp(32px,5vw,60px);line-height:1.02;letter-spacing:-0.03em;">See it before <span style="color:var(--blue);">you download it.</span></h2>
+    <div style="display:grid;grid-template-columns:minmax(220px,330px) minmax(300px,760px);gap:clamp(28px,5vw,64px);align-items:start;margin-top:48px;justify-content:start;">
+
+      <div data-reveal style="border:1px solid var(--line);background:rgba(255,255,255,0.03);border-radius:16px;padding:14px;max-width:330px;margin-inline:auto;">
+        <video src="/media/my-tech-buddy-demo.mp4" poster="/media/my-tech-buddy-demo.jpg"
+               controls muted loop playsinline preload="none"
+               style="display:block;width:100%;height:auto;border-radius:8px;background:#000;"
+               aria-label="My Tech Buddy walkthrough: Identify, Connect, Ask, Diagnose and Library"></video>
+        <p style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;">Recorded on device &nbsp;·&nbsp; iOS 15.0 or later</p>
+      </div>
+
+      <div>
+        <div data-reveal style="border:1px solid var(--line);background:rgba(255,255,255,0.03);border-radius:16px;padding:30px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.24em;color:var(--blue);text-transform:uppercase;">What&rsquo;s new in 1.1</div>
+          <ul style="margin:16px 0 0;padding-left:18px;font-size:14px;line-height:1.75;color:var(--muted);">
+            <li>A refreshed look and a smoother experience throughout.</li>
+            <li><strong style="color:var(--white);font-weight:600;">Identify shows clear progress</strong> while it works, so you know it hasn&rsquo;t stalled.</li>
+            <li>Connecting devices is faster.</li>
+            <li>A handful of bugs squashed along the way.</li>
+          </ul>
+        </div>
+        <div data-reveal data-delay="0.1" style="margin-top:18px;border:1px solid var(--line);background:rgba(255,255,255,0.03);border-radius:16px;padding:30px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.24em;color:var(--blue);text-transform:uppercase;">In the walkthrough</div>
+          <ul style="margin:16px 0 0;padding-left:18px;font-size:14px;line-height:1.75;color:var(--muted);">
+            <li><strong style="color:var(--white);font-weight:600;">Identify</strong> &mdash; photograph a device, a cable, or the back of something with ports.</li>
+            <li><strong style="color:var(--white);font-weight:600;">Connect</strong> &mdash; name two things and get walked through joining them.</li>
+            <li><strong style="color:var(--white);font-weight:600;">Ask</strong> &mdash; questions in your own words, answered plainly.</li>
+            <li><strong style="color:var(--white);font-weight:600;">Diagnose</strong> &mdash; describe the problem, fix it one step at a time.</li>
+            <li><strong style="color:var(--white);font-weight:600;">Library</strong> &mdash; everything you identify, saved with its setup guide.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>

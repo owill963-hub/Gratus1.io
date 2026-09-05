@@ -57,6 +57,42 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script src="./support.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Tactical Vibes",
+      "url": "https://gratus1.io/tactical-vibes",
+      "applicationCategory": "MobileApplication",
+      "operatingSystem": "iOS 15.0 or later",
+      "softwareVersion": "1.4",
+      "datePublished": "2026-09-01",
+      "description": "Firearms inventory and compatibility: arsenal, optics, ammo, range sessions, maintenance, CCW reciprocity and an on-device AI Build Advisor.",
+      "installUrl": "https://apps.apple.com/us/app/tactical-vibes/id6776399589",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "O Williams Consulting LLC",
+        "url": "https://gratus1.io"
+      }
+    },
+    {
+      "@type": "VideoObject",
+      "name": "Tactical Vibes 1.4 walkthrough",
+      "description": "My Arsenal and the rebuilt AI Build Advisor, recorded on device.",
+      "uploadDate": "2026-09-05",
+      "thumbnailUrl": "https://gratus1.io/media/tactical-vibes-demo.jpg",
+      "contentUrl": "https://gratus1.io/media/tactical-vibes-demo.mp4"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <x-dc>
@@ -103,6 +139,7 @@
       <span style="font-weight:600;font-size:15px;letter-spacing:.02em;">Tactical Vibes</span>
     </a>
     <div style="display:flex;align-items:center;gap:clamp(16px,3vw,36px);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;">
+      <a href="#whats-new" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--green);">What&rsquo;s new</a>
       <a href="#capabilities" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--green);">Capabilities</a>
       <a href="#how" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--green);">How it works</a>
       <a href="#support" style="color:var(--muted);transition:color .25s;" style-hover="color:var(--green);">Support</a>
@@ -194,6 +231,45 @@
         <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:40px;color:var(--green);line-height:1;">03</div>
         <h4 style="margin-top:18px;font-weight:600;font-size:19px;">Build with confidence</h4>
         <p style="margin-top:10px;font-size:14px;line-height:1.6;color:var(--muted);">Assemble your setup — no guesswork.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEW -->
+  <section id="whats-new" style="position:relative;z-index:10;padding:clamp(70px,9vh,130px) clamp(24px,6vw,80px);border-top:1px solid var(--line);">
+    <div data-reveal style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;color:var(--green);text-transform:uppercase;"><span style="width:26px;height:1px;background:var(--green);"></span>// Version 1.4 &nbsp;·&nbsp; 1 September 2026</div>
+    <h2 data-reveal data-delay="0.05" style="margin-top:20px;font-weight:700;font-size:clamp(32px,5vw,60px);line-height:1.02;letter-spacing:-0.03em;">Rebuilt under the hood. <span style="color:var(--green);">Sharper up top.</span></h2>
+    <div style="display:grid;grid-template-columns:minmax(220px,330px) minmax(300px,760px);gap:clamp(28px,5vw,64px);align-items:start;margin-top:48px;justify-content:start;">
+
+      <div data-reveal style="border:1px solid var(--line);background:#0A0718;padding:14px;max-width:330px;margin-inline:auto;">
+        <video src="/media/tactical-vibes-demo.mp4" poster="/media/tactical-vibes-demo.jpg"
+               controls muted loop playsinline preload="none"
+               style="display:block;width:100%;height:auto;background:#000;"
+               aria-label="Tactical Vibes 1.4 walkthrough: My Arsenal and the AI Build Advisor"></video>
+        <p style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;">Recorded on device &nbsp;·&nbsp; iOS 15.0 or later</p>
+      </div>
+
+      <div>
+        <div data-reveal style="border:1px solid var(--line);background:#100C24;padding:30px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.24em;color:var(--green);text-transform:uppercase;">New</div>
+          <ul style="margin:16px 0 0;padding-left:18px;font-size:14px;line-height:1.75;color:var(--muted);">
+            <li><strong style="color:var(--white);font-weight:600;">AI Build Advisor, rebuilt.</strong> Runs on-device with Apple Intelligence, only asks what you haven&rsquo;t already said, and knows what you own.</li>
+            <li>Add any build to your inventory with one tap.</li>
+            <li>Appearance setting: System, Light, or Dark.</li>
+            <li>Account is one tap away &mdash; gear icon on the Dashboard, or the new Account tab.</li>
+            <li>Manufacturer names auto-correct as you type (S&amp;W &rarr; Smith &amp; Wesson, HK &rarr; Heckler &amp; Koch).</li>
+          </ul>
+        </div>
+        <div data-reveal data-delay="0.1" style="margin-top:18px;border:1px solid var(--line);background:#100C24;padding:30px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.24em;color:var(--green);text-transform:uppercase;">Improved</div>
+          <ul style="margin:16px 0 0;padding-left:18px;font-size:14px;line-height:1.75;color:var(--muted);">
+            <li>New purple-and-blue palette and a redesigned Dashboard with the T.V. crosshair.</li>
+            <li>My Arsenal groups Arsenal, Gear, Maintenance and Manage under one switcher.</li>
+            <li>Gear leads with your own equipment; partner offers moved below.</li>
+            <li>CCW Reciprocity updated to the 2026 permitless-carry baseline, classifying every state and DC.</li>
+            <li>Training Finder uses curated national resources &mdash; no network required.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>

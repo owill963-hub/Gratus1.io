@@ -19,9 +19,16 @@ deployed via Cloudflare Workers static assets (see `wrangler.jsonc`).
 
 ## Layout
 
-- `index.html` — primary landing page (hero, ventures, values, app support, footer).
-- `mytechbuddy.html` — "My Tech Buddy" product page.
-- `tacticalvibes.html` — "Tactical Vibes" product page.
+- `index.html` — legacy landing page; the live root is served from `Gratus1 Nebula.dc.html`.
+- **The live product pages are the `*.dc.html` files.** `worker.js` maps clean URLs to them
+  (`PAGE_ROUTES`): `/` → `Gratus1 Nebula.dc.html`, `/home` → `Gratus1 Home.dc.html`,
+  `/my-tech-buddy` → `My Tech Buddy.dc.html`, `/tactical-vibes` → `Tactical Vibes.dc.html`,
+  `/status-board` → `Daily Dashboard.html`. Edit those, not the plain `.html` exports.
+- `mytechbuddy.html`, `tacticalvibes.html` — legacy pages, kept only so the worker can 301
+  them to the clean URLs. Editing them changes nothing a visitor sees.
+- `My Tech Buddy.html`, `Tactical Vibes.html` — raw design-tool exports, excluded in
+  `.assetsignore` and never published.
+- `media/` — demo video and poster frames used by the product pages.
 - `Gratus1.html` — older/alternate landing page draft; not linked from any page or
   the sitemap. Treat `index.html` as the canonical landing page.
 - `favicon.svg`, `gratus1-social-share.png` — site icon and OG/social share image.
