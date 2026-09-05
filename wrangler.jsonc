@@ -3,6 +3,15 @@
   "name": "gratus1",
   "main": "worker.js",
   "compatibility_date": "2026-05-31",
+  "vars": {
+    // Not secrets — only the token is. Kept here so the repo, workflow and ref
+    // the panel dispatches are visible in review rather than buried in a secret.
+    "GH_REPO": "owill963-hub/gratus1-ops",
+    "GH_WORKFLOW": "nightly-ops.yml",
+    "GH_REF": "main",
+    "MONITOR_URL": "https://postiz-monitor.owill963.workers.dev"
+  },
+
   "observability": {
     "enabled": true
   },

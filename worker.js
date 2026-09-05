@@ -720,9 +720,41 @@ async function rerunAgent(agent, env) {
     }
   }
   if (agent === "nightly-ops") {
-    // Triggering a GitHub Actions workflow needs a repo-scoped token this worker
-    // does not hold. Say so plainly rather than pretending the button worked.
-    return { ok: false, detail: "not wired: needs a GitHub token with workflow scope" };
+    if (!env.GH_WORKFLOW_TOKEN) {
+      return { ok: false, detail: "GH_WORKFLOW_TOKEN is not set on this worker" };
+    }
+    const repo = env.GH_REPO || "owill963-hub/gratus1-ops";
+    const wf = env.GH_WORKFLOW || "nightly-ops.yml";
+    const ref = env.GH_REF || "main";
+    try {
+      // workflow_dispatch returns 204 with no body on success. A 404 here almost
+      // always means the token lacks Actions: write on this repo rather than a
+      // wrong path — GitHub hides unauthorised resources rather than 403ing.
+      const r = await fetch(
+        `https://api.github.com/repos/${repo}/actions/workflows/${wf}/dispatches`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${env.GH_WORKFLOW_TOKEN}`,
+            Accept: "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "gratus1-agent-panel",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ ref, inputs: { dry_run: "false" } }),
+        },
+      );
+      if (r.status === 204) return { ok: true, detail: `dispatched ${wf} on ${ref}` };
+      const text = (await r.text()).slice(0, 200);
+      return {
+        ok: false,
+        detail: r.status === 404
+          ? "404 — token most likely lacks Actions: write on " + repo
+          : `GitHub ${r.status}: ${text}`,
+      };
+    } catch (e) {
+      return { ok: false, detail: String((e && e.message) || e) };
+    }
   }
   return { ok: false, detail: "no rerun path for this agent" };
 }
