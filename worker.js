@@ -25,7 +25,13 @@ const PAGE_ROUTES = {
 // reached directly, un-gated.
 const PROTECTED = ["/status-board", "/Daily%20Dashboard.html", "/feed.json"];
 const DASH_COOKIE = "g1_dash";
-const FEED_KEY = "feed:current"; // KV key holding the live status-board feed
+const FEED_KEY = "feed:current";
+// Agent heartbeats. Each scheduled agent posts here after a successful run, so
+// the two independent schedulers — Cloudflare cron and GitHub Actions — can
+// watch each other. A silent death is otherwise indistinguishable from a quiet
+// night: the board would keep serving the last-good feed forever with no signal.
+const HEARTBEAT_KEY = "agents:heartbeats";
+const HEARTBEAT_STALE_MIN = { "nightly-ops": 26 * 60, "postiz-monitor": 90 }; // KV key holding the live status-board feed
 
 // Legacy pages → their new canonical URLs (301 so search engines transfer rank)
 const LEGACY_REDIRECTS = {
@@ -70,6 +76,12 @@ export default {
     const cleanPath = url.pathname.length > 1 && url.pathname.endsWith("/")
       ? url.pathname.slice(0, -1)
       : url.pathname;
+
+    // Agent heartbeat intake. Deliberately its own bearer secret rather than the
+    // dashboard cookie gate: this is called by CI, not by a browser.
+    if (cleanPath === "/agent-heartbeat") {
+      return agentHeartbeat(request, env);
+    }
 
     // Private dashboard gate: returns a Response to block/redirect, or null to allow
     // (checked against the normalized path so "/status-board/" can't bypass it)
@@ -415,4 +427,63 @@ async function updateGitHub(feed, env) {
 
   if (todos.length) setSection(feed, "todo", { source: "GitHub · live", items: todos });
   if (tickets.length) setSection(feed, "ticket", { source: "GitHub · live", items: tickets });
+}
+
+// ── Agent heartbeats ─────────────────────────────────────────────────────────
+// POST /agent-heartbeat  {agent, status, detail}   Authorization: Bearer <key>
+// Returns the age of the feed alongside every recorded heartbeat, so the caller
+// can check the other scheduler in the same round-trip it uses to report itself.
+async function agentHeartbeat(request, env) {
+  const json = (obj, status = 200) =>
+    new Response(JSON.stringify(obj), {
+      status,
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+
+  if (!env.HEARTBEAT_KEY) return json({ error: "heartbeat key not configured" }, 503);
+  const auth = request.headers.get("authorization") || "";
+  const presented = auth.replace(/^Bearer\s+/i, "");
+  // Constant-time-ish: compare digests, not the raw strings.
+  const ok = presented &&
+    (await sha256Hex(presented)) === (await sha256Hex(env.HEARTBEAT_KEY));
+  if (!ok) return json({ error: "unauthorized" }, 401);
+
+  const beats = (await readKvJson(env, HEARTBEAT_KEY)) || {};
+
+  if (request.method === "POST") {
+    let body = {};
+    try { body = await request.json(); } catch { /* tolerate an empty ping */ }
+    const agent = String(body.agent || "").slice(0, 40);
+    if (!agent) return json({ error: "agent is required" }, 400);
+    beats[agent] = {
+      at: new Date().toISOString(),
+      status: String(body.status || "ok").slice(0, 20),
+      detail: String(body.detail || "").slice(0, 300),
+    };
+    if (env.FEED_KV) await env.FEED_KV.put(HEARTBEAT_KEY, JSON.stringify(beats));
+  }
+
+  const feed = await readKvJson(env, FEED_KEY);
+  const feedAt = feed && feed.generatedAt ? Date.parse(feed.generatedAt) : null;
+  return json({
+    ok: true,
+    feed_generated_at: feed && feed.generatedAt ? feed.generatedAt : null,
+    feed_age_minutes: feedAt ? Math.round((Date.now() - feedAt) / 60000) : null,
+    heartbeats: beats,
+    stale: staleAgents(beats),
+  });
+}
+
+// Which agents have missed their window. Threshold per agent, because a 30-min
+// cron and a nightly job fail on very different timescales.
+function staleAgents(beats) {
+  const out = [];
+  for (const [agent, limit] of Object.entries(HEARTBEAT_STALE_MIN)) {
+    const b = beats && beats[agent];
+    if (!b) { out.push({ agent, age_minutes: null, reason: "never reported" }); continue; }
+    const age = Math.round((Date.now() - Date.parse(b.at)) / 60000);
+    if (age > limit) out.push({ agent, age_minutes: age, limit_minutes: limit, reason: "overdue" });
+    else if (b.status && b.status !== "ok") out.push({ agent, age_minutes: age, reason: `last run ${b.status}` });
+  }
+  return out;
 }
